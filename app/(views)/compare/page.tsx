@@ -1,22 +1,10 @@
-"use client";
-
-import { useMemo } from "react";
-import { useSearchParams } from "next/navigation";
-import CompareClient from "./CompareClient";
-import { usePlayersData } from "../../components/PlayersDataProvider";
+import { Suspense } from "react";
+import ComparePageClient from "./ComparePageClient";
 
 export default function ComparePage() {
-  const searchParams = useSearchParams();
-  const idsParam = searchParams.get("ids") ?? "";
-  const initialSelectedIds = useMemo(
-    () => (idsParam ? idsParam.split(",").filter(Boolean) : []),
-    [idsParam],
-  );
-
-  const { state } = usePlayersData();
-  const players = state.players;
-
   return (
-    <CompareClient players={players} initialSelectedIds={initialSelectedIds} />
+    <Suspense fallback={null}>
+      <ComparePageClient />
+    </Suspense>
   );
 }

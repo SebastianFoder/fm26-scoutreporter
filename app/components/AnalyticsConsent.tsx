@@ -1,8 +1,8 @@
 "use client";
 
 import posthog from "posthog-js";
-import { usePathname, useSearchParams } from "next/navigation";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 
@@ -99,13 +99,16 @@ export function AnalyticsConsentProvider({
 }) {
   const [consent, setConsent] = useState<Consent>(null);
   const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState<string>("/");
 
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const url = useMemo(() => {
-    const qs = searchParams?.toString();
-    return qs ? `${pathname}?${qs}` : pathname;
-  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    // Avoid `useSearchParams()` here so we don't require a Suspense boundary in the
+    // root layout. We only need the full URL for page view capture.
+    if (typeof window === "undefined") return;
+    setUrl(`${window.location.pathname}${window.location.search}`);
+  }, [pathname]);
 
   useEffect(() => {
     const c = readConsent();

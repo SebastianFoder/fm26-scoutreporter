@@ -248,11 +248,15 @@ export function AttributeColorConfig() {
               Color
             </span>
 
-            {(["excellent", "good", "average"] as AttributeBand[]).map((band) => (
+            {(
+              ["excellent", "good", "average"] as const satisfies ReadonlyArray<
+                keyof typeof active.thresholds
+              >
+            ).map((band) => (
               <FragmentRow
                 key={band}
                 label={band}
-                value={active.thresholds[band === "excellent" ? "excellent" : band]}
+                value={active.thresholds[band]}
                 color={active.colors[band]}
                 onThresholdChange={(val) =>
                   updateActive((p) => ({
