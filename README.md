@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FM26 Scout Reporter
 
-## Getting Started
+A modern web app for importing **Football Manager 26** player CSV exports and turning them into a searchable, comparable scouting view with configurable:
 
-First, run the development server:
+- Attribute **weights** (profiles)
+- Highlighted attributes (profiles)
+- Attribute colour thresholds (profiles)
+- Light/Dark themes
+- Player comparison (gold/silver/bronze per attribute, relative to selected players)
+
+## Features
+
+- **CSV import** (semicolon-delimited FM export) from the homepage
+- **Persisted import** (stored in `sessionStorage`, survives navigation)
+- **Player list** with score + highlighted attributes
+- **Player profile** view (with goalkeeper-specific layout when position includes `GK`)
+- **Compare view** with:
+  - Player selector (search + pagination)
+  - Comparison table
+  - Per-row medal ranking (gold/silver/bronze)
+- **How to use** page with step-by-step exporter setup guide
+
+## Getting started
+
+Install dependencies and run the dev server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Import CSV**: Homepage → “Choose CSV file”
+- **Weights**: Homepage → “Weights” (modal)
+  - Weights are **1–10 integers**
+  - Profiles auto-save to `localStorage`
+- **Highlights**: Homepage → “Highlights” (modal)
+  - Toggle which attributes appear as highlighted columns
+  - Profiles auto-save to `localStorage`
+- **Attribute colors**: Header → “Attribute Colors” (modal)
+  - Configure thresholds + colors
+  - Profiles auto-save to `localStorage`
+- **Compare**: Homepage → select players → “Compare selected players”
 
-## Learn More
+## File download (FM view)
 
-To learn more about Next.js, take a look at the following resources:
+The custom FM view is included at:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `public/scouting-exporter.fmf`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Users can download it from the **How to use** page.
 
-## Deploy on Vercel
+## Analytics (PostHog) with opt-in consent
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This app supports **PostHog** analytics with a **first-launch opt-in modal**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- If the user opts out, analytics are disabled for the client and the choice is saved in `localStorage`.
+- The footer includes an “Analytics preferences” link to reopen the consent modal.
+
+### Environment variables
+
+Create `.env.local`:
+
+```bash
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
+```
+
+If `NEXT_PUBLIC_POSTHOG_KEY` is not set, PostHog will not initialize even if the user opts in.
+
+## Tech stack
+
+- Next.js (App Router)
+- React
+- TypeScript
+- Tailwind CSS
+- PostHog (`posthog-js`)
+
