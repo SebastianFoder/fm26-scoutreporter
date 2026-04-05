@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { PlayerWithGroups } from "../../data/players-store";
 import type { AttributeKey } from "../../types/weights";
 import { computeScore, getPlayerAttributeValue } from "../../lib/scoring";
@@ -12,7 +12,7 @@ import {
 import { useActiveWeights } from "../../components/WeightConfig";
 import { useHighlightedAttributes } from "../../components/HighlightedAttributesConfig";
 import Link from "next/link";
-import { ArrowDown, ArrowUp, ExternalLink } from "lucide-react";
+import { ArrowDown, ArrowUp, ExternalLink, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   PaginationControls,
@@ -46,9 +46,11 @@ function buildListQuery(
     pageSize: PageSizeChoice;
     sort: string;
     sortDir: SortDir;
+    q?: string;
   },
 ): string {
   const p = new URLSearchParams();
+  if (opts.q) p.set("q", opts.q);
   if (opts.page > 1) p.set("page", String(opts.page));
   if (opts.pageSize !== 10) {
     p.set("pageSize", opts.pageSize === "all" ? "all" : String(opts.pageSize));
@@ -57,8 +59,8 @@ function buildListQuery(
     p.set("sort", opts.sort);
     p.set("sortDir", opts.sortDir);
   }
-  const q = p.toString();
-  return q ? `${pathname}?${q}` : pathname;
+  const qs = p.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
 }
 
 function parseListSort(
@@ -86,6 +88,69 @@ function parseListSort(
   }
 
   return { sort: DEFAULT_SORT, sortDir: DEFAULT_SORT_DIR };
+}
+
+function getSearchQuery(searchParams: URLSearchParams): string {
+  return (searchParams.get("q") ?? "").trim();
+}
+
+/** Split display name into words (commas treated as spaces, for "Surname, First" exports). */
+function normalizeNameWords(display: string): string[] {
+  return display
+    .replace(/,/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function splitPlayerNameParts(words: string[]): {
+  first: string;
+  middle: string[];
+  last: string;
+} {
+  if (words.length === 0) {
+    return { first: "", middle: [], last: "" };
+  }
+  if (words.length === 1) {
+    const w = words[0];
+    return { first: w, middle: [], last: w };
+  }
+  return {
+    first: words[0],
+    middle: words.slice(1, -1),
+    last: words[words.length - 1],
+  };
+}
+
+function partMatchesToken(part: string, tokenLower: string): boolean {
+  return part.toLowerCase().includes(tokenLower);
+}
+
+/**
+ * Space-separated terms are ANDed. Each term may match first name, last name,
+ * any middle segment, or any substring of the full name (single-term behavior).
+ */
+function playerMatchesNameSearch(display: string, query: string): boolean {
+  const tokens = query
+    .toLowerCase()
+    .split(/\s+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  if (tokens.length === 0) return true;
+
+  const words = normalizeNameWords(display);
+  const { first, middle, last } = splitPlayerNameParts(words);
+  const fullLower = display.toLowerCase();
+
+  return tokens.every((token) => {
+    if (partMatchesToken(first, token)) return true;
+    if (partMatchesToken(last, token)) return true;
+    for (const m of middle) {
+      if (partMatchesToken(m, token)) return true;
+    }
+    if (fullLower.includes(token)) return true;
+    return false;
+  });
 }
 
 function compareRows(a: Row, b: Row, sort: string, sortDir: SortDir): number {
@@ -215,6 +280,16 @@ function PlayersListClientInner({
     [searchParams, highlighted],
   );
 
+  const searchQuery = useMemo(
+    () => getSearchQuery(searchParams),
+    [searchParams],
+  );
+  const [draft, setDraft] = useState(searchQuery);
+
+  const urlPage = parsePageParam(searchParams.get("page"));
+  const urlPageSize = parsePageSizeParam(searchParams.get("pageSize"));
+  const pageSize: PageSizeChoice = urlPageSize;
+
   const rows = useMemo(
     () =>
       players.map((p) => ({
@@ -224,18 +299,19 @@ function PlayersListClientInner({
     [players, weights],
   );
 
+  const filteredRows = useMemo(() => {
+    if (!searchQuery) return rows;
+    return rows.filter((r) => playerMatchesNameSearch(r.p.raw.player, searchQuery));
+  }, [rows, searchQuery]);
+
   const sortedRows = useMemo(() => {
-    const copy = [...rows];
+    const copy = [...filteredRows];
     copy.sort((a, b) => compareRows(a, b, listSort, listSortDir));
     return copy;
-  }, [rows, listSort, listSortDir]);
+  }, [filteredRows, listSort, listSortDir]);
 
   const total = sortedRows.length;
 
-  const urlPage = parsePageParam(searchParams.get("page"));
-  const urlPageSize = parsePageSizeParam(searchParams.get("pageSize"));
-
-  const pageSize: PageSizeChoice = urlPageSize;
   const pageCount =
     total === 0
       ? 1
@@ -247,9 +323,31 @@ function PlayersListClientInner({
   const page = Math.min(rawPage, pageCount);
 
   const listQueryOpts = useMemo(
-    () => ({ page, pageSize, sort: listSort, sortDir: listSortDir }),
-    [page, pageSize, listSort, listSortDir],
+    () => ({ page, pageSize, sort: listSort, sortDir: listSortDir, q: searchQuery }),
+    [page, pageSize, listSort, listSortDir, searchQuery],
   );
+
+  useEffect(() => {
+    setDraft(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const trimmed = draft.trim();
+    if (trimmed === searchQuery) return;
+    const id = setTimeout(() => {
+      router.replace(
+        buildListQuery(pathname, {
+          page: 1,
+          pageSize,
+          sort: listSort,
+          sortDir: listSortDir,
+          q: trimmed,
+        }),
+        { scroll: false },
+      );
+    }, 300);
+    return () => clearTimeout(id);
+  }, [draft, searchQuery, pathname, pageSize, listSort, listSortDir, router]);
 
   useEffect(() => {
     if (rawPage === page) return;
@@ -273,6 +371,7 @@ function PlayersListClientInner({
     pageSize: PageSizeChoice;
     sort: string;
     sortDir: SortDir;
+    q?: string;
   }) => {
     router.replace(buildListQuery(pathname, opts), { scroll: false });
   };
@@ -290,6 +389,7 @@ function PlayersListClientInner({
       pageSize: nextSize,
       sort: listSort,
       sortDir: listSortDir,
+      q: searchQuery,
     });
   };
 
@@ -308,12 +408,44 @@ function PlayersListClientInner({
       pageSize,
       sort: next.sort,
       sortDir: next.sortDir,
+      q: searchQuery,
     });
   };
 
   return (
     <div className="mx-auto max-w-5xl space-y-5 p-6 text-[oklch(var(--text))]">
       <h1 className="text-2xl font-black uppercase tracking-tight">Players</h1>
+
+      <div className="flex items-center gap-3">
+        <label className="text-xs font-black uppercase tracking-wider text-[oklch(var(--text))]/55">
+          Search
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="First, middle, last — use spaces for several parts"
+            className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 py-1.5 pr-8 text-sm text-[oklch(var(--text))] shadow-[2px_2px_0_oklch(var(--border))] placeholder:text-[oklch(var(--text))]/30 focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]"
+          />
+          {draft && (
+            <button
+              type="button"
+              onClick={() => setDraft("")}
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-[oklch(var(--text))]/50 hover:text-[oklch(var(--text))]"
+              aria-label="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {searchQuery && total === 0 && (
+        <p className="text-sm font-bold text-[oklch(var(--text))]/60">
+          No players match &ldquo;{searchQuery}&rdquo;
+        </p>
+      )}
 
       <div className="overflow-x-auto rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] shadow-[4px_4px_0_oklch(var(--border))]">
         <table className="min-w-full text-sm">
