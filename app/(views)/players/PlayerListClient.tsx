@@ -1,6 +1,15 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import type { PlayerWithGroups } from "../../data/players-store";
 import type { AttributeKey } from "../../types/weights";
 import { computeScore, getPlayerAttributeValue } from "../../lib/scoring";
@@ -274,6 +283,24 @@ function PlayersListClientInner({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pendingScrollYRef = useRef<number | null>(null);
+
+  const replacePreservingScroll = useCallback(
+    (href: string) => {
+      pendingScrollYRef.current = window.scrollY;
+      router.replace(href, { scroll: false });
+    },
+    [router],
+  );
+
+  const listQueryKey = searchParams.toString();
+
+  useLayoutEffect(() => {
+    const y = pendingScrollYRef.current;
+    if (y === null) return;
+    pendingScrollYRef.current = null;
+    window.scrollTo(0, y);
+  }, [listQueryKey]);
 
   const { sort: listSort, sortDir: listSortDir } = useMemo(
     () => parseListSort(searchParams, highlighted),
@@ -335,7 +362,7 @@ function PlayersListClientInner({
     const trimmed = draft.trim();
     if (trimmed === searchQuery) return;
     const id = setTimeout(() => {
-      router.replace(
+      replacePreservingScroll(
         buildListQuery(pathname, {
           page: 1,
           pageSize,
@@ -343,18 +370,25 @@ function PlayersListClientInner({
           sortDir: listSortDir,
           q: trimmed,
         }),
-        { scroll: false },
       );
     }, 300);
     return () => clearTimeout(id);
-  }, [draft, searchQuery, pathname, pageSize, listSort, listSortDir, router]);
+  }, [
+    draft,
+    searchQuery,
+    pathname,
+    pageSize,
+    listSort,
+    listSortDir,
+    replacePreservingScroll,
+  ]);
 
   useEffect(() => {
     if (rawPage === page) return;
-    router.replace(buildListQuery(pathname, { ...listQueryOpts, page }), {
-      scroll: false,
-    });
-  }, [rawPage, page, pathname, router, listQueryOpts]);
+    replacePreservingScroll(
+      buildListQuery(pathname, { ...listQueryOpts, page }),
+    );
+  }, [rawPage, page, pathname, replacePreservingScroll, listQueryOpts]);
 
   const effectiveSize = pageSize === "all" ? Math.max(1, total) : pageSize;
   const pageItems =
@@ -373,7 +407,7 @@ function PlayersListClientInner({
     sortDir: SortDir;
     q?: string;
   }) => {
-    router.replace(buildListQuery(pathname, opts), { scroll: false });
+    replacePreservingScroll(buildListQuery(pathname, opts));
   };
 
   const setUrlPagination = (nextPage: number, nextSize: PageSizeChoice) => {
