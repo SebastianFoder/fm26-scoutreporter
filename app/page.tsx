@@ -25,9 +25,13 @@ export default function Home() {
 
     try {
       const text = await file.text();
-      setCsvText(text);
+      const persisted = setCsvText(text);
       setSelectedIds([]);
-      setError(null);
+      setError(
+        persisted
+          ? null
+          : "Import loaded in this tab only: browser storage is full or blocked. Free space or allow storage to keep data across tabs and visits.",
+      );
     } catch (e) {
       console.error(e);
       setError("Could not parse CSV. Please check the file format.");

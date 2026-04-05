@@ -53,7 +53,8 @@ function loadFromStorage(): StoredConfig {
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
+    if (!raw)
+      return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
     const parsed = JSON.parse(raw) as StoredConfig;
     if (!parsed.profiles?.length) {
       return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
@@ -83,9 +84,7 @@ export function useActiveAttributeProfile(): AttributeColorProfile {
   const ctx = useAttributeColorContext();
   const { activeId, profiles } = ctx.state;
   return (
-    profiles.find((p) => p.id === activeId) ??
-    profiles[0] ??
-    DEFAULT_PROFILE
+    profiles.find((p) => p.id === activeId) ?? profiles[0] ?? DEFAULT_PROFILE
   );
 }
 
@@ -108,10 +107,12 @@ export function AttributeColorProvider({
     profiles: [DEFAULT_PROFILE],
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect -- post-SSR localStorage hydration */
   useEffect(() => {
     const stored = loadFromStorage();
     setState(stored);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     saveToStorage(state);
@@ -143,12 +144,12 @@ export function AttributeColorConfig() {
   const active =
     profiles.find((p) => p.id === activeId) ?? profiles[0] ?? DEFAULT_PROFILE;
 
-  const updateActive = (updater: (p: AttributeColorProfile) => AttributeColorProfile) => {
+  const updateActive = (
+    updater: (p: AttributeColorProfile) => AttributeColorProfile,
+  ) => {
     setState((prev) => ({
       activeId: prev.activeId,
-      profiles: prev.profiles.map((p) =>
-        p.id === active.id ? updater(p) : p,
-      ),
+      profiles: prev.profiles.map((p) => (p.id === active.id ? updater(p) : p)),
     }));
   };
 
@@ -288,7 +289,8 @@ export function AttributeColorConfig() {
           </div>
 
           <p className="text-xs text-[oklch(var(--text))]/70">
-            Colors are hex values like <code className="font-mono">#34d399</code>.
+            Colors are hex values like{" "}
+            <code className="font-mono">#34d399</code>.
           </p>
         </div>
       </Modal>
@@ -304,8 +306,14 @@ function FragmentRow(props: {
   onThresholdChange?: (value: number) => void;
   onColorChange?: (value: string) => void;
 }) {
-  const { label, value, color, readOnlyThreshold, onThresholdChange, onColorChange } =
-    props;
+  const {
+    label,
+    value,
+    color,
+    readOnlyThreshold,
+    onThresholdChange,
+    onColorChange,
+  } = props;
 
   const pretty =
     label[0].toUpperCase() + label.slice(1).toLowerCase() + " Attribute";
@@ -315,7 +323,9 @@ function FragmentRow(props: {
       <span className="py-1 text-[11px]">{pretty}</span>
       <span className="py-1">
         {readOnlyThreshold ? (
-          <span className="text-[11px] text-[oklch(var(--text))/0.7]">0–{value}</span>
+          <span className="text-[11px] text-[oklch(var(--text))/0.7]">
+            0–{value}
+          </span>
         ) : (
           <input
             type="number"
@@ -344,4 +354,3 @@ function FragmentRow(props: {
     </>
   );
 }
-

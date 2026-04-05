@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -28,11 +29,13 @@ type PlayersDataState = {
 type PlayersDataContextValue = {
   state: PlayersDataState;
   setState: Dispatch<SetStateAction<PlayersDataState>>;
-  setCsvText: (csvText: string) => void;
+  /** Returns false if the CSV could not be persisted (e.g. storage quota). In-memory state is still updated. */
+  setCsvText: (csvText: string) => boolean;
   clear: () => void;
 };
 
 const STORAGE_KEY = "importedPlayersCsv";
+const LEGACY_SESSION_KEY = "importedPlayersCsv";
 
 const PlayersDataContext = createContext<PlayersDataContextValue | null>(null);
 
@@ -41,16 +44,38 @@ function parseAndGroup(csvText: string): PlayerWithGroups[] {
   return parsed.map((p) => ({ raw: p, grouped: groupPlayerAttributes(p) }));
 }
 
-export function PlayersDataProvider({ children }: { children: React.ReactNode }) {
+function readStoredCsv(): string | null {
+  try {
+    let stored = window.localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      const legacy = window.sessionStorage.getItem(LEGACY_SESSION_KEY);
+      if (legacy) {
+        window.localStorage.setItem(STORAGE_KEY, legacy);
+        window.sessionStorage.removeItem(LEGACY_SESSION_KEY);
+        stored = legacy;
+      }
+    }
+    return stored;
+  } catch {
+    return null;
+  }
+}
+
+export function PlayersDataProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { capture } = useAnalytics();
   const [state, setState] = useState<PlayersDataState>({
     csvText: null,
     players: [],
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect -- post-SSR localStorage hydration */
   useEffect(() => {
     try {
-      const stored = window.sessionStorage.getItem(STORAGE_KEY);
+      const stored = readStoredCsv();
       if (!stored) return;
       const players = parseAndGroup(stored);
       setState({ csvText: stored, players });
@@ -58,22 +83,56 @@ export function PlayersDataProvider({ children }: { children: React.ReactNode })
       // ignore
     }
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-  const setCsvText = (csvText: string) => {
-    const players = parseAndGroup(csvText);
-    setState({ csvText, players });
-    window.sessionStorage.setItem(STORAGE_KEY, csvText);
-    capture("players_imported", { player_count: players.length });
-  };
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY) return;
+      if (e.newValue) {
+        try {
+          const players = parseAndGroup(e.newValue);
+          setState({ csvText: e.newValue, players });
+        } catch {
+          setState({ csvText: null, players: [] });
+        }
+      } else {
+        setState({ csvText: null, players: [] });
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
-  const clear = () => {
+  const setCsvText = useCallback(
+    (csvText: string) => {
+      const players = parseAndGroup(csvText);
+      setState({ csvText, players });
+      let persisted = true;
+      try {
+        window.localStorage.setItem(STORAGE_KEY, csvText);
+        window.sessionStorage.removeItem(LEGACY_SESSION_KEY);
+      } catch {
+        persisted = false;
+      }
+      capture("players_imported", { player_count: players.length });
+      return persisted;
+    },
+    [capture],
+  );
+
+  const clear = useCallback(() => {
     setState({ csvText: null, players: [] });
-    window.sessionStorage.removeItem(STORAGE_KEY);
-  };
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+      window.sessionStorage.removeItem(LEGACY_SESSION_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const value = useMemo(
     () => ({ state, setState, setCsvText, clear }),
-    [state],
+    [state, setCsvText, clear],
   );
 
   return (
@@ -90,4 +149,3 @@ export function usePlayersData() {
   }
   return ctx;
 }
-

@@ -44,7 +44,7 @@ function shutdownPostHog() {
   try {
     posthog.opt_out_capturing();
     posthog.reset();
-    (posthog as any).shutdown?.();
+    void (posthog as unknown as { shutdown?: () => void }).shutdown?.();
   } catch {
     // ignore
   }
@@ -86,7 +86,7 @@ export function useAnalytics() {
   if (!ctx) {
     return {
       consent: null as Consent,
-      capture: (_event: string, _properties?: Record<string, unknown>) => {},
+      capture: () => {},
     };
   }
   return { consent: ctx.consent, capture: ctx.capture };
@@ -99,17 +99,10 @@ export function AnalyticsConsentProvider({
 }) {
   const [consent, setConsent] = useState<Consent>(null);
   const [open, setOpen] = useState(false);
-  const [url, setUrl] = useState<string>("/");
 
   const pathname = usePathname();
 
-  useEffect(() => {
-    // Avoid `useSearchParams()` here so we don't require a Suspense boundary in the
-    // root layout. We only need the full URL for page view capture.
-    if (typeof window === "undefined") return;
-    setUrl(`${window.location.pathname}${window.location.search}`);
-  }, [pathname]);
-
+  /* eslint-disable react-hooks/set-state-in-effect -- post-SSR localStorage hydration */
   useEffect(() => {
     const c = readConsent();
     setConsent(c);
@@ -117,12 +110,15 @@ export function AnalyticsConsentProvider({
     if (c === "opt_out") shutdownPostHog();
     if (c === "opt_in") initPostHogIfPossible();
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (consent !== "opt_in") return;
     if (!posthog.__loaded) return;
-    capturePageView(url);
-  }, [consent, url]);
+    if (typeof window === "undefined") return;
+    const fullUrl = `${window.location.pathname}${window.location.search}`;
+    capturePageView(fullUrl);
+  }, [consent, pathname]);
 
   const accept = () => {
     writeConsent("opt_in");

@@ -71,6 +71,20 @@ NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
 
 If `NEXT_PUBLIC_POSTHOG_KEY` is not set, PostHog will not initialize even if the user opts in.
 
+## Releases
+
+This project uses [semantic-release](https://github.com/semantic-release/semantic-release) to automate versioning and GitHub Releases. Releases are triggered automatically when commits land on `master`.
+
+Commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) format so semantic-release can determine the next version:
+
+| Prefix | Version bump |
+|--------|-------------|
+| `fix:` | Patch (0.0.x) |
+| `feat:` | Minor (0.x.0) |
+| `feat!:` / `BREAKING CHANGE:` footer | Major (x.0.0) |
+
+Other prefixes like `chore:`, `docs:`, `ci:` do not trigger a release.
+
 ## Tech stack
 
 - Next.js (App Router)

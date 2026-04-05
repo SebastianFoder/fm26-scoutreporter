@@ -1,7 +1,10 @@
-import { getPlayers } from "../../data/players-store";
-import PlayersListClient from "./PlayerListClient";
+import { Suspense } from "react";
+import PlayersPageClient from "./PlayersPageClient";
 
 export default function PlayersPage() {
-  const players = getPlayers();
-  return <PlayersListClient players={players} />;
+  return (
+    <Suspense fallback={null}>
+      <PlayersPageClient />
+    </Suspense>
+  );
 }

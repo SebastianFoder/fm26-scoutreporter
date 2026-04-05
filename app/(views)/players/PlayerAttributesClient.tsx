@@ -6,6 +6,7 @@ import {
   useActiveAttributeProfile,
 } from "../../components/AttributeColorConfig";
 import type { AttributeKey } from "../../types/weights";
+import { getGroupedAttributeValue } from "../../lib/grouped-attribute-value";
 
 interface Props {
   grouped: GroupedAttributes;
@@ -54,13 +55,7 @@ const GK_TECHNICAL_KEYS: AttributeKey[] = [
 ];
 
 function getValueByKey(grouped: GroupedAttributes, key: AttributeKey): number {
-  return (
-    (grouped.goalkeeping as any)[key] ??
-    (grouped.technical as any)[key] ??
-    (grouped.mental as any)[key] ??
-    (grouped.physical as any)[key] ??
-    0
-  );
+  return getGroupedAttributeValue(grouped, key);
 }
 
 function prettyLabel(key: AttributeKey) {
@@ -70,7 +65,9 @@ function prettyLabel(key: AttributeKey) {
   return withSpaces
     .split(" ")
     .map((word) =>
-      word.length > 0 ? word[0].toUpperCase() + word.slice(1).toLowerCase() : "",
+      word.length > 0
+        ? word[0].toUpperCase() + word.slice(1).toLowerCase()
+        : "",
     )
     .join(" ");
 }
@@ -140,13 +137,18 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[oklch(var(--text))/0.7]">
           {title}
         </h2>
-        <dl className={`grid ${compact ? "gap-y-0.5 text-xs" : "gap-y-1 text-sm"}`}>
+        <dl
+          className={`grid ${compact ? "gap-y-0.5 text-xs" : "gap-y-1 text-sm"}`}
+        >
           {sorted.map((key) => {
             const value = getValueByKey(grouped, key);
             const band = getBandForValue(value, profile.thresholds);
             const color = profile.colors[band];
             return (
-              <div key={key} className="flex items-center justify-between gap-3">
+              <div
+                key={key}
+                className="flex items-center justify-between gap-3"
+              >
                 <dt className="text-[oklch(var(--text))/0.9]">
                   {prettyLabel(key)}
                 </dt>
@@ -182,10 +184,11 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
             {renderColumn("Mental", grouped.mental)}
             {renderColumn("Physical", grouped.physical)}
           </div>
-          <div className="mt-3">{renderColumn("Goalkeeping", grouped.goalkeeping, true)}</div>
+          <div className="mt-3">
+            {renderColumn("Goalkeeping", grouped.goalkeeping, true)}
+          </div>
         </>
       )}
     </div>
   );
 }
-

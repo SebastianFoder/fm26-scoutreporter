@@ -9,6 +9,7 @@ import { useHighlightedAttributes } from "../../components/HighlightedAttributes
 import Link from "next/link";
 import { useAnalytics } from "../../components/AnalyticsConsent";
 import { Button } from "../../components/Button";
+import { getGroupedAttributeValue } from "../../lib/grouped-attribute-value";
 
 interface Props {
   players: PlayerWithGroups[];
@@ -36,10 +37,11 @@ export default function CompareClient({
   const highlightedKeys =
     highlighted.length > 0 ? highlighted : FALLBACK_HIGHLIGHTED_KEYS;
 
-  // Debounce search to avoid heavy filtering on each keypress
+  // Debounce search and reset pagination together
   useEffect(() => {
     const t = window.setTimeout(() => {
       setDebouncedQuery(query);
+      setPage(1);
     }, 250);
     return () => window.clearTimeout(t);
   }, [query]);
@@ -53,11 +55,6 @@ export default function CompareClient({
       return name.includes(q) || pos.includes(q) || p.raw.uniqueId.includes(q);
     });
   }, [players, debouncedQuery]);
-
-  // reset pagination when query changes
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedQuery]);
 
   const PAGE_SIZE = 50;
   const pageCount = Math.max(1, Math.ceil(filteredPlayers.length / PAGE_SIZE));
@@ -121,7 +118,9 @@ export default function CompareClient({
             variant="solid"
             size="sm"
             onClick={() => {
-              const top = filteredPlayers.slice(0, 10).map((p) => p.raw.uniqueId);
+              const top = filteredPlayers
+                .slice(0, 10)
+                .map((p) => p.raw.uniqueId);
               setSelectedIds(top);
             }}
             disabled={filteredPlayers.length === 0}
@@ -205,7 +204,9 @@ export default function CompareClient({
         {filteredPlayers.length > 0 && (
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-xs text-[oklch(var(--text))]/70">
-              Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filteredPlayers.length)} of {filteredPlayers.length}
+              Showing {(page - 1) * PAGE_SIZE + 1}–
+              {Math.min(page * PAGE_SIZE, filteredPlayers.length)} of{" "}
+              {filteredPlayers.length}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -248,105 +249,105 @@ export default function CompareClient({
           <div className="overflow-x-auto rounded-xl border border-[oklch(var(--text))]/30">
             <table className="min-w-full text-xs">
               <thead className="bg-[oklch(var(--text))]/10">
-              <tr>
-                <th className="sticky left-0 z-10 px-3 py-2 text-left bg-[oklch(var(--text))]/10">
-                  Metric
-                </th>
-                {scored.map(({ p }) => (
-                  <th key={p.raw.uniqueId} className="px-3 py-2 text-left">
-                    <div className="font-medium">
-                      <Link
-                        href={`/players/${p.raw.uniqueId}`}
-                        className="hover:underline"
-                      >
-                        {p.raw.player}
-                      </Link>
-                    </div>
-                    <div className="text-[10px] text-[oklch(var(--text))/0.65]">
-                      {p.raw.position}
-                    </div>
+                <tr>
+                  <th className="sticky left-0 z-10 px-3 py-2 text-left bg-[oklch(var(--text))]/10">
+                    Metric
                   </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-[oklch(var(--text))]/30 bg-[oklch(var(--text))]/5">
-                <td className="sticky left-0 z-10 px-3 py-2 font-semibold bg-[oklch(var(--text))]/5">
-                  Weighted score
-                </td>
-                {(() => {
-                  const medals = medalsByPlayerId(
-                    scored.map(({ p, score }) => ({
-                      id: p.raw.uniqueId,
-                      value: score,
-                    })),
-                  );
-
-                  return scored.map(({ p, score }) => {
-                    const medal = medals[p.raw.uniqueId];
-                    return (
-                      <td key={p.raw.uniqueId} className="px-3 py-2 text-right">
-                        <span
-                          className={[
-                            "font-mono text-sm font-semibold",
-                            medal ? medalTextClass[medal] : "",
-                          ].join(" ")}
+                  {scored.map(({ p }) => (
+                    <th key={p.raw.uniqueId} className="px-3 py-2 text-left">
+                      <div className="font-medium">
+                        <Link
+                          href={`/players/${p.raw.uniqueId}`}
+                          className="hover:underline"
                         >
-                          {score.toFixed(2)}
-                        </span>
-                      </td>
+                          {p.raw.player}
+                        </Link>
+                      </div>
+                      <div className="text-[10px] text-[oklch(var(--text))/0.65]">
+                        {p.raw.position}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-[oklch(var(--text))]/30 bg-[oklch(var(--text))]/5">
+                  <td className="sticky left-0 z-10 px-3 py-2 font-semibold bg-[oklch(var(--text))]/5">
+                    Weighted score
+                  </td>
+                  {(() => {
+                    const medals = medalsByPlayerId(
+                      scored.map(({ p, score }) => ({
+                        id: p.raw.uniqueId,
+                        value: score,
+                      })),
                     );
-                  });
-                })()}
-              </tr>
 
-              {highlightedKeys.map((key, idx) => {
-                const values = scored.map(({ p }) => {
-                  const g = p.grouped;
-                  const value: number =
-                    (g.goalkeeping as any)[key] ??
-                    (g.technical as any)[key] ??
-                    (g.mental as any)[key] ??
-                    (g.physical as any)[key] ??
-                    0;
-                  return { id: p.raw.uniqueId, value };
-                });
-
-                const medals = medalsByPlayerId(values);
-
-                return (
-                  <tr
-                    key={key}
-                    className={[
-                      "border-b border-[oklch(var(--text))]/20 last:border-0",
-                      idx % 2 === 0 ? "bg-transparent" : "bg-[oklch(var(--text))]/5",
-                    ].join(" ")}
-                  >
-                    <td className="sticky left-0 z-10 px-3 py-1.5 font-medium bg-inherit">
-                      <span className="capitalize">{key}</span>
-                    </td>
-                    {scored.map(({ p }) => {
-                      const v =
-                        values.find((x) => x.id === p.raw.uniqueId)?.value ?? 0;
+                    return scored.map(({ p, score }) => {
                       const medal = medals[p.raw.uniqueId];
                       return (
                         <td
-                          key={p.raw.uniqueId + key}
-                          className={[
-                            "px-3 py-1.5 text-right font-mono text-sm",
-                            medal
-                              ? medalTextClass[medal]
-                              : "text-[oklch(var(--text))]/85",
-                          ].join(" ")}
+                          key={p.raw.uniqueId}
+                          className="px-3 py-2 text-right"
                         >
-                          {v}
+                          <span
+                            className={[
+                              "font-mono text-sm font-semibold",
+                              medal ? medalTextClass[medal] : "",
+                            ].join(" ")}
+                          >
+                            {score.toFixed(2)}
+                          </span>
                         </td>
                       );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
+                    });
+                  })()}
+                </tr>
+
+                {highlightedKeys.map((key, idx) => {
+                  const values = scored.map(({ p }) => {
+                    const value = getGroupedAttributeValue(p.grouped, key);
+                    return { id: p.raw.uniqueId, value };
+                  });
+
+                  const medals = medalsByPlayerId(values);
+
+                  return (
+                    <tr
+                      key={key}
+                      className={[
+                        "border-b border-[oklch(var(--text))]/20 last:border-0",
+                        idx % 2 === 0
+                          ? "bg-transparent"
+                          : "bg-[oklch(var(--text))]/5",
+                      ].join(" ")}
+                    >
+                      <td className="sticky left-0 z-10 px-3 py-1.5 font-medium bg-inherit">
+                        <span className="capitalize">{key}</span>
+                      </td>
+                      {scored.map(({ p }) => {
+                        const v =
+                          values.find((x) => x.id === p.raw.uniqueId)?.value ??
+                          0;
+                        const medal = medals[p.raw.uniqueId];
+                        return (
+                          <td
+                            key={p.raw.uniqueId + key}
+                            className={[
+                              "px-3 py-1.5 text-right font-mono text-sm",
+                              medal
+                                ? medalTextClass[medal]
+                                : "text-[oklch(var(--text))]/85",
+                            ].join(" ")}
+                          >
+                            {v}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           </div>
         </section>

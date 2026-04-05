@@ -46,7 +46,8 @@ function loadFromStorage(): StoredConfig {
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
+    if (!raw)
+      return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
     const parsed = JSON.parse(raw) as StoredConfig;
     if (!parsed.profiles?.length) {
       return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
@@ -84,9 +85,11 @@ export function HighlightedAttributesProvider({
     profiles: [DEFAULT_PROFILE],
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect -- post-SSR localStorage hydration */
   useEffect(() => {
     setState(loadFromStorage());
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     saveToStorage(state);
@@ -361,4 +364,3 @@ export function HighlightConfigModal({
     </Modal>
   );
 }
-

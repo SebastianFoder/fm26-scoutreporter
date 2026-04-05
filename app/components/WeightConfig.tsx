@@ -9,12 +9,19 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import type { AttributeKey, AttributeWeights, WeightProfile } from "../types/weights";
+import type {
+  AttributeKey,
+  AttributeWeights,
+  WeightProfile,
+} from "../types/weights";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 import { useAnalytics } from "./AnalyticsConsent";
 
 const STORAGE_KEY = "weightProfiles";
+
+/** Upper bound for per-attribute weight inputs and stored values (wider ratio vs min 1). */
+const WEIGHT_MAX = 20;
 
 const DEFAULT_PROFILE: WeightProfile = {
   id: "default",
@@ -36,21 +43,34 @@ const WeightContext = createContext<WeightContextValue | null>(null);
 
 function loadFromStorage(): StoredConfig {
   if (typeof window === "undefined") {
-    return { activeId: DEFAULT_PROFILE.id, profiles: [withNormalizedWeights(DEFAULT_PROFILE)] };
+    return {
+      activeId: DEFAULT_PROFILE.id,
+      profiles: [withNormalizedWeights(DEFAULT_PROFILE)],
+    };
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { activeId: DEFAULT_PROFILE.id, profiles: [withNormalizedWeights(DEFAULT_PROFILE)] };
+    if (!raw)
+      return {
+        activeId: DEFAULT_PROFILE.id,
+        profiles: [withNormalizedWeights(DEFAULT_PROFILE)],
+      };
     const parsed = JSON.parse(raw) as StoredConfig;
     if (!parsed.profiles?.length) {
-      return { activeId: DEFAULT_PROFILE.id, profiles: [withNormalizedWeights(DEFAULT_PROFILE)] };
+      return {
+        activeId: DEFAULT_PROFILE.id,
+        profiles: [withNormalizedWeights(DEFAULT_PROFILE)],
+      };
     }
     return {
       activeId: parsed.activeId ?? DEFAULT_PROFILE.id,
       profiles: parsed.profiles.map(withNormalizedWeights),
     };
   } catch {
-    return { activeId: DEFAULT_PROFILE.id, profiles: [withNormalizedWeights(DEFAULT_PROFILE)] };
+    return {
+      activeId: DEFAULT_PROFILE.id,
+      profiles: [withNormalizedWeights(DEFAULT_PROFILE)],
+    };
   }
 }
 
@@ -77,9 +97,11 @@ export function WeightProvider({ children }: { children: React.ReactNode }) {
     profiles: [withNormalizedWeights(DEFAULT_PROFILE)],
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect -- post-SSR localStorage hydration */
   useEffect(() => {
     setState(loadFromStorage());
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     saveToStorage(state);
@@ -310,7 +332,7 @@ export function WeightConfigModal({
               <input
                 type="number"
                 min={1}
-                max={10}
+                max={WEIGHT_MAX}
                 step={1}
                 className="w-20 rounded-xl border border-[oklch(var(--alt))/0.6] bg-[oklch(var(--alt))/0.8] px-2 py-1 text-right font-mono text-sm"
                 value={pWeight(active.weights, k)}
@@ -362,7 +384,12 @@ export function WeightConfigModal({
             <Button color="alt" variant="solid" size="sm" onClick={createNew}>
               Create New
             </Button>
-            <Button color="primary" variant="solid" size="sm" onClick={duplicate}>
+            <Button
+              color="primary"
+              variant="solid"
+              size="sm"
+              onClick={duplicate}
+            >
               Duplicate
             </Button>
             <Button
@@ -374,10 +401,20 @@ export function WeightConfigModal({
             >
               Delete
             </Button>
-            <Button color="primary" variant="solid" size="sm" onClick={exportProfile}>
+            <Button
+              color="primary"
+              variant="solid"
+              size="sm"
+              onClick={exportProfile}
+            >
               Export
             </Button>
-            <Button color="alt" variant="solid" size="sm" onClick={importProfile}>
+            <Button
+              color="alt"
+              variant="solid"
+              size="sm"
+              onClick={importProfile}
+            >
               Import
             </Button>
           </div>
@@ -418,7 +455,7 @@ function pWeight(weights: AttributeWeights, key: AttributeKey) {
 
 function clampWeight(value: number) {
   if (!Number.isFinite(value)) return 1;
-  return Math.min(10, Math.max(1, Math.round(value)));
+  return Math.min(WEIGHT_MAX, Math.max(1, Math.round(value)));
 }
 
 function defaultWeights(): AttributeWeights {
@@ -430,10 +467,9 @@ function withNormalizedWeights(profile: WeightProfile): WeightProfile {
   const normalized: AttributeWeights = {};
 
   for (const k of ALL_KEYS) {
-    const raw = (weights as any)[k];
+    const raw = weights[k];
     normalized[k] = clampWeight(typeof raw === "number" ? raw : 1);
   }
 
   return { ...profile, weights: normalized };
 }
-
