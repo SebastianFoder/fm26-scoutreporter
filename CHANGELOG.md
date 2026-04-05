@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.1.0...v1.2.0) (2026-04-05)
+
+
+### Features
+
+* **players:** add debounced name search with shareable q param ([407ed1d](https://github.com/SebastianFoder/fm26-scoutreporter/commit/407ed1da1978bb97a4f0f7e72ab0345a0ff55267))
+
 # [1.1.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.0.0...v1.1.0) (2026-04-05)
 
 
