@@ -50,18 +50,20 @@ export function PaginationControls({
   return (
     <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-wrap items-center gap-3 text-xs text-[oklch(var(--text))]/70">
-        <span>
-          Showing {showingFrom}–{showingTo} of {totalItems}
+        <span className="font-mono">
+          {showingFrom}–{showingTo} of {totalItems}
         </span>
         <label className="inline-flex items-center gap-2">
-          <span className="text-[oklch(var(--text))]/55">Rows</span>
+          <span className="font-bold uppercase tracking-wide text-[oklch(var(--text))]/55">
+            Rows
+          </span>
           <select
             value={pageSize === "all" ? "all" : String(pageSize)}
             onChange={(e) => {
               const v = e.target.value;
               onPageSizeChange(v === "all" ? "all" : (Number(v) as PageSizeChoice));
             }}
-            className="rounded-lg border border-[oklch(var(--alt))/0.6] bg-[oklch(var(--alt))/0.8] px-2 py-1 text-xs text-[oklch(var(--text))]"
+            className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 text-xs font-mono text-[oklch(var(--text))] shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]"
           >
             {SIZE_OPTIONS.map((s) => (
               <option key={String(s)} value={s === "all" ? "all" : String(s)}>
@@ -71,7 +73,9 @@ export function PaginationControls({
           </select>
         </label>
         <label className="inline-flex items-center gap-2">
-          <span className="text-[oklch(var(--text))]/55">Go to</span>
+          <span className="font-bold uppercase tracking-wide text-[oklch(var(--text))]/55">
+            Go to
+          </span>
           <input
             type="number"
             min={1}
@@ -79,7 +83,7 @@ export function PaginationControls({
             value={jumpValue}
             onChange={(e) => setJumpValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && applyJump()}
-            className="w-14 rounded-lg border border-[oklch(var(--alt))/0.6] bg-[oklch(var(--alt))/0.8] px-2 py-1 text-right font-mono text-xs"
+            className="w-14 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 text-right font-mono text-xs shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]"
           />
           <Button color="alt" variant="outline" size="sm" type="button" onClick={applyJump}>
             Go
@@ -106,8 +110,8 @@ export function PaginationControls({
         >
           Prev
         </Button>
-        <span className="px-1 text-xs text-[oklch(var(--text))]/70">
-          Page {page} / {pageCount}
+        <span className="px-1 font-mono text-xs font-bold text-[oklch(var(--text))]/70">
+          {page} / {pageCount}
         </span>
         <Button
           color="alt"

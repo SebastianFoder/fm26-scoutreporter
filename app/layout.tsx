@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto, Geist_Mono } from "next/font/google";
+import { Outfit, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeSwitcher } from "./components/ThemeSwitcher";
 import {
@@ -15,15 +15,16 @@ import {
   AnalyticsPreferencesLink,
 } from "./components/AnalyticsConsent";
 
-const roboto = Roboto({
-  variable: "--font-roboto",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -72,23 +73,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${outfit.variable} ${spaceMono.variable} antialiased`}>
         <AttributeColorProvider>
           <AnalyticsConsentProvider>
             <WeightProvider>
               <PlayersDataProvider>
                 <HighlightedAttributesProvider>
                   <div className="flex min-h-screen flex-col">
-                    <header className="flex items-center justify-end gap-2 border-b border-[oklch(var(--text))]/30 bg-[oklch(var(--text))]/10 px-4 py-2">
+                    <header className="flex items-center justify-end gap-2 border-b-3 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-2">
                       <Link
                         href="/"
-                        className="rounded-full px-3 py-1 text-sm text-[oklch(var(--text))/0.85] hover:bg-[oklch(var(--text))]/10"
+                        className="rounded-lg border-2 border-transparent px-3 py-1 text-sm font-bold uppercase tracking-wide text-[oklch(var(--text))] hover:border-[oklch(var(--border))] hover:bg-[oklch(var(--background))]"
                       >
                         Home
                       </Link>
                       <Link
                         href="/how-to-use"
-                        className="rounded-full px-3 py-1 text-sm text-[oklch(var(--text))/0.85] hover:bg-[oklch(var(--text))]/10"
+                        className="rounded-lg border-2 border-transparent px-3 py-1 text-sm font-bold uppercase tracking-wide text-[oklch(var(--text))] hover:border-[oklch(var(--border))] hover:bg-[oklch(var(--background))]"
                       >
                         How to use
                       </Link>
@@ -96,11 +97,11 @@ export default function RootLayout({
                       <ThemeSwitcher />
                     </header>
                     <main className="flex-1">{children}</main>
-                    <footer className="border-t border-[oklch(var(--text))]/30 bg-[oklch(var(--text))]/5 px-4 py-4">
-                      <div className="mx-auto flex max-w-6xl flex-col gap-2 text-sm text-[oklch(var(--text))/0.75] sm:flex-row sm:items-center sm:justify-between">
+                    <footer className="border-t-3 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-4">
+                      <div className="mx-auto flex max-w-6xl flex-col gap-2 text-sm text-[oklch(var(--text))] sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           Developed by{" "}
-                          <span className="font-medium text-[oklch(var(--text))/0.9]">
+                          <span className="font-bold">
                             Sebastian Foder
                           </span>
                         </div>
@@ -109,7 +110,7 @@ export default function RootLayout({
                             href="https://github.com/SebastianFoder"
                             target="_blank"
                             rel="noreferrer"
-                            className="hover:underline text-[oklch(var(--primary))]"
+                            className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
                           >
                             GitHub
                           </a>
@@ -117,11 +118,11 @@ export default function RootLayout({
                             href="https://x.com/F1ngs"
                             target="_blank"
                             rel="noreferrer"
-                            className="hover:underline text-[oklch(var(--primary))]"
+                            className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
                           >
                             Twitter
                           </a>
-                          <AnalyticsPreferencesLink className="hover:underline text-[oklch(var(--primary))]" />
+                          <AnalyticsPreferencesLink className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]" />
                         </div>
                       </div>
                     </footer>

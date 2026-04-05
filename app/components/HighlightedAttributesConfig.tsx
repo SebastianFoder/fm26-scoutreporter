@@ -258,7 +258,7 @@ export function HighlightConfigModal({
     const sorted = [...keys].sort((a, b) => a.localeCompare(b));
     return (
       <div>
-        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[oklch(var(--text))/0.7]">
+        <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-[oklch(var(--text))/0.65]">
           {title}
         </h3>
         <div className="space-y-1">
@@ -267,14 +267,14 @@ export function HighlightConfigModal({
             return (
               <label
                 key={k}
-                className="flex cursor-pointer items-center justify-between gap-3 rounded-xl px-2 py-1 hover:bg-[oklch(var(--text))]/10"
+                className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-transparent px-2 py-1 hover:border-[oklch(var(--border))]/30 hover:bg-[oklch(var(--primary))]/5"
               >
-                <span className="text-sm text-[oklch(var(--text))/0.9]">
+                <span className="text-sm text-[oklch(var(--text))/0.85]">
                   {titleCaseFromCamel(k)}
                 </span>
                 <input
                   type="checkbox"
-                  className="h-4 w-4"
+                  className="h-4 w-4 accent-[oklch(var(--primary))]"
                   checked={checked}
                   onChange={() => toggleKey(k)}
                 />
@@ -309,7 +309,7 @@ export function HighlightConfigModal({
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <select
-              className="rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-2 py-1 text-sm"
+              className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 text-sm font-bold shadow-[2px_2px_0_oklch(var(--border))]"
               value={active.id}
               onChange={(e) =>
                 setState((prev) => ({ ...prev, activeId: e.target.value }))
@@ -345,7 +345,7 @@ export function HighlightConfigModal({
 
           <input
             type="text"
-            className="w-full rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-3 py-2 text-sm sm:w-64"
+            className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 py-2 text-sm font-bold shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))] sm:w-64"
             value={active.name}
             onChange={(e) =>
               updateActive((p) => ({ ...p, name: e.target.value }))

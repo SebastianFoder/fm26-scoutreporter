@@ -18,54 +18,47 @@ function cn(...parts: Array<string | undefined | false | null>) {
   return parts.filter(Boolean).join(" ");
 }
 
+const BRUTAL_SHADOW = "shadow-[2px_2px_0_oklch(var(--border))]";
+const BRUTAL_SHADOW_HOVER = "hover:shadow-[1px_1px_0_oklch(var(--border))]";
+const BRUTAL_PRESS =
+  "hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none";
+
 const COLOR_STYLES: Record<ButtonColor, Record<ButtonVariant, string>> = {
   primary: {
-    solid:
-      "bg-[oklch(var(--primary))] text-[oklch(var(--text))] hover:bg-[oklch(var(--primary))]/85",
-    outline:
-      "bg-transparent shadow-none border border-[oklch(var(--primary))]/80 text-[oklch(var(--primary))] hover:bg-[oklch(var(--primary))]/15",
+    solid: `border-2 border-[oklch(var(--border))] bg-[oklch(var(--primary))] text-[oklch(var(--background))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
+    outline: `border-2 border-[oklch(var(--primary))] bg-transparent text-[oklch(var(--primary))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
     ghost:
-      "bg-transparent shadow-none text-[oklch(var(--primary))] hover:bg-[oklch(var(--primary))]/15",
+      "border-2 border-transparent bg-transparent text-[oklch(var(--primary))] hover:bg-[oklch(var(--primary))]/10",
   },
   alt: {
-    solid:
-      "bg-[oklch(var(--alt))]/70 text-[oklch(var(--text))] hover:bg-[oklch(var(--alt))]/55",
-    outline:
-      "bg-transparent shadow-none border border-[oklch(var(--text))]/40 text-[oklch(var(--text))] hover:bg-[oklch(var(--text))]/10",
+    solid: `border-2 border-[oklch(var(--border))] bg-[oklch(var(--alt))] text-[oklch(var(--background))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
+    outline: `border-2 border-[oklch(var(--border))] bg-transparent text-[oklch(var(--text))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
     ghost:
-      "bg-transparent shadow-none text-[oklch(var(--text))] hover:bg-[oklch(var(--text))]/10",
+      "border-2 border-transparent bg-transparent text-[oklch(var(--text))] hover:bg-[oklch(var(--text))]/10",
   },
   red: {
-    solid:
-      "bg-[oklch(var(--red-bg))] text-[oklch(var(--red-text))] hover:bg-[oklch(var(--red-bg))]/85",
-    outline:
-      "bg-transparent shadow-none border border-[oklch(var(--red-bg))]/80 text-[oklch(var(--red-bg))] hover:bg-[oklch(var(--red-bg))]/15",
+    solid: `border-2 border-[oklch(var(--border))] bg-[oklch(var(--red-bg))] text-[oklch(var(--red-text))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
+    outline: `border-2 border-[oklch(var(--red-bg))] bg-transparent text-[oklch(var(--red-bg))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
     ghost:
-      "bg-transparent shadow-none text-[oklch(var(--red-bg))] hover:bg-[oklch(var(--red-bg))]/15",
+      "border-2 border-transparent bg-transparent text-[oklch(var(--red-bg))] hover:bg-[oklch(var(--red-bg))]/10",
   },
   gold: {
-    solid:
-      "bg-[oklch(var(--gold-bg))] text-[oklch(var(--gold-text))] hover:bg-[oklch(var(--gold-bg))]/85",
-    outline:
-      "bg-transparent shadow-none border border-[oklch(var(--gold-bg))]/80 text-[oklch(var(--gold-bg))] hover:bg-[oklch(var(--gold-bg))]/15",
+    solid: `border-2 border-[oklch(var(--border))] bg-[oklch(var(--gold-bg))] text-[oklch(var(--gold-text))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
+    outline: `border-2 border-[oklch(var(--gold-bg))] bg-transparent text-[oklch(var(--gold-bg))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
     ghost:
-      "bg-transparent shadow-none text-[oklch(var(--gold-bg))] hover:bg-[oklch(var(--gold-bg))]/15",
+      "border-2 border-transparent bg-transparent text-[oklch(var(--gold-bg))] hover:bg-[oklch(var(--gold-bg))]/10",
   },
   silver: {
-    solid:
-      "bg-[oklch(var(--silver-bg))] text-[oklch(var(--silver-text))] hover:bg-[oklch(var(--silver-bg))]/85",
-    outline:
-      "bg-transparent shadow-none border border-[oklch(var(--silver-bg))]/80 text-[oklch(var(--silver-bg))] hover:bg-[oklch(var(--silver-bg))]/15",
+    solid: `border-2 border-[oklch(var(--border))] bg-[oklch(var(--silver-bg))] text-[oklch(var(--silver-text))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
+    outline: `border-2 border-[oklch(var(--silver-bg))] bg-transparent text-[oklch(var(--silver-bg))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
     ghost:
-      "bg-transparent shadow-none text-[oklch(var(--silver-bg))] hover:bg-[oklch(var(--silver-bg))]/15",
+      "border-2 border-transparent bg-transparent text-[oklch(var(--silver-bg))] hover:bg-[oklch(var(--silver-bg))]/10",
   },
   bronze: {
-    solid:
-      "bg-[oklch(var(--bronze-bg))] text-[oklch(var(--bronze-text))] hover:bg-[oklch(var(--bronze-bg))]/85",
-    outline:
-      "bg-transparent shadow-none border border-[oklch(var(--bronze-bg))]/80 text-[oklch(var(--bronze-bg))] hover:bg-[oklch(var(--bronze-bg))]/15",
+    solid: `border-2 border-[oklch(var(--border))] bg-[oklch(var(--bronze-bg))] text-[oklch(var(--bronze-text))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
+    outline: `border-2 border-[oklch(var(--bronze-bg))] bg-transparent text-[oklch(var(--bronze-bg))] ${BRUTAL_SHADOW} ${BRUTAL_SHADOW_HOVER} ${BRUTAL_PRESS}`,
     ghost:
-      "bg-transparent shadow-none text-[oklch(var(--bronze-bg))] hover:bg-[oklch(var(--bronze-bg))]/15",
+      "border-2 border-transparent bg-transparent text-[oklch(var(--bronze-bg))] hover:bg-[oklch(var(--bronze-bg))]/10",
   },
 };
 
@@ -91,7 +84,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const base =
-      "inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-full font-medium shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--primary))/0.5] disabled:pointer-events-none disabled:opacity-50";
+      "inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-lg font-bold transition-all focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[oklch(var(--primary))] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
     const variantClass = COLOR_STYLES[color][variant];
 
     const content = (

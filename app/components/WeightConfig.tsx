@@ -320,13 +320,13 @@ export function WeightConfigModal({
     const sorted = [...keys].sort((a, b) => a.localeCompare(b));
     return (
       <div>
-        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[oklch(var(--text))/0.7]">
+        <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-[oklch(var(--text))/0.65]">
           {title}
         </h3>
         <div className="space-y-1">
           {sorted.map((k) => (
-            <div key={k} className="flex items-center justify-between gap-3">
-              <div className="text-sm text-[oklch(var(--text))/0.9]">
+            <div key={k} className="flex items-center justify-between gap-3 border-b border-[oklch(var(--border))]/15 py-0.5 last:border-0">
+              <div className="text-sm text-[oklch(var(--text))/0.85]">
                 {titleCaseFromCamel(k)}
               </div>
               <input
@@ -334,7 +334,7 @@ export function WeightConfigModal({
                 min={1}
                 max={WEIGHT_MAX}
                 step={1}
-                className="w-20 rounded-xl border border-[oklch(var(--alt))/0.6] bg-[oklch(var(--alt))/0.8] px-2 py-1 text-right font-mono text-sm"
+                className="w-20 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 text-right font-mono text-sm shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]"
                 value={pWeight(active.weights, k)}
                 onChange={(e) => setWeight(k, safeNumber(e.target.value))}
               />
@@ -369,7 +369,7 @@ export function WeightConfigModal({
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <select
-              className="rounded-xl border border-[oklch(var(--alt))/0.6] bg-[oklch(var(--alt))/0.8] px-2 py-1 text-sm"
+              className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 text-sm font-bold shadow-[2px_2px_0_oklch(var(--border))]"
               value={active.id}
               onChange={(e) =>
                 setState((prev) => ({ ...prev, activeId: e.target.value }))
@@ -421,7 +421,7 @@ export function WeightConfigModal({
 
           <input
             type="text"
-            className="w-full rounded-xl border border-[oklch(var(--alt))/0.6] bg-[oklch(var(--alt))/0.8] px-3 py-2 text-sm sm:w-64"
+            className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 py-2 text-sm font-bold shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))] sm:w-64"
             value={active.name}
             onChange={(e) =>
               updateActive((p) => ({ ...p, name: e.target.value }))
@@ -438,7 +438,7 @@ export function WeightConfigModal({
         </div>
 
         <textarea
-          className="h-32 w-full rounded-2xl border border-[oklch(var(--alt))/0.5] bg-[oklch(var(--alt))/0.6] p-3 font-mono text-xs"
+          className="h-32 w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] p-3 font-mono text-xs shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]"
           value={json}
           onChange={(e) => setJson(e.target.value)}
           placeholder="Exported profile JSON will appear here. Paste JSON here to import."

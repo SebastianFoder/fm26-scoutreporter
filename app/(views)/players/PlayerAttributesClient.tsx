@@ -2,6 +2,7 @@
 
 import type { GroupedAttributes } from "../../types/grouped-attributes";
 import {
+  attributeBandColor,
   getBandForValue,
   useActiveAttributeProfile,
 } from "../../components/AttributeColorConfig";
@@ -86,7 +87,7 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
 
     return (
       <div>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[oklch(var(--text))/0.7]">
+        <h2 className="mb-2 text-sm font-black uppercase tracking-wider text-[oklch(var(--text))/0.65]">
           {title}
         </h2>
         <dl
@@ -105,16 +106,15 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
               )
               .join(" ");
             const band = getBandForValue(value, profile.thresholds);
-            const color = profile.colors[band];
             return (
               <div
                 key={key}
-                className="flex items-center justify-between gap-3"
+                className="flex items-center justify-between gap-3 border-b border-[oklch(var(--border))]/15 py-0.5 last:border-0"
               >
-                <dt className="text-[oklch(var(--text))/0.9]">{pretty}</dt>
+                <dt className="text-[oklch(var(--text))/0.85]">{pretty}</dt>
                 <dd
-                  className="min-w-[1.75rem] text-right font-mono text-base"
-                  style={{ color }}
+                  className="min-w-[1.75rem] text-right font-mono text-base font-bold"
+                  style={{ color: attributeBandColor(band) }}
                 >
                   {value}
                 </dd>
@@ -134,7 +134,7 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
     const sorted = [...keys].sort((a, b) => a.localeCompare(b));
     return (
       <div>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[oklch(var(--text))/0.7]">
+        <h2 className="mb-2 text-sm font-black uppercase tracking-wider text-[oklch(var(--text))/0.65]">
           {title}
         </h2>
         <dl
@@ -143,18 +143,17 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
           {sorted.map((key) => {
             const value = getValueByKey(grouped, key);
             const band = getBandForValue(value, profile.thresholds);
-            const color = profile.colors[band];
             return (
               <div
                 key={key}
-                className="flex items-center justify-between gap-3"
+                className="flex items-center justify-between gap-3 border-b border-[oklch(var(--border))]/15 py-0.5 last:border-0"
               >
-                <dt className="text-[oklch(var(--text))/0.9]">
+                <dt className="text-[oklch(var(--text))/0.85]">
                   {prettyLabel(key)}
                 </dt>
                 <dd
-                  className="min-w-[1.75rem] text-right font-mono text-base"
-                  style={{ color }}
+                  className="min-w-[1.75rem] text-right font-mono text-base font-bold"
+                  style={{ color: attributeBandColor(band) }}
                 >
                   {value}
                 </dd>
@@ -167,7 +166,7 @@ export function PlayerAttributesClient({ grouped, isGoalkeeper }: Props) {
   };
 
   return (
-    <div className="space-y-3 rounded-2xl bg-[oklch(var(--text))]/10 px-4 py-4 shadow-sm">
+    <div className="space-y-3 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-4 shadow-[4px_4px_0_oklch(var(--border))]">
       {isGoalkeeper ? (
         <div className="grid gap-4 md:grid-cols-3">
           {renderKeyColumn("Goalkeeping", GK_PANEL_KEYS)}

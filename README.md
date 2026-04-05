@@ -4,7 +4,7 @@ A modern web app for importing **Football Manager 26** player CSV exports and tu
 
 - Attribute **weights** (profiles)
 - Highlighted attributes (profiles)
-- Attribute colour thresholds (profiles)
+- Attribute value bands / thresholds (profiles)
 - Light/Dark themes
 - Player comparison (gold/silver/bronze per attribute, relative to selected players)
 
@@ -40,8 +40,8 @@ Open `http://localhost:3000`.
 - **Highlights**: Homepage → “Highlights” (modal)
   - Toggle which attributes appear as highlighted columns
   - Profiles auto-save to `localStorage`
-- **Attribute colors**: Header → “Attribute Colors” (modal)
-  - Configure thresholds + colors
+- **Attribute thresholds**: Header → “Attribute thresholds” (modal)
+  - Configure numeric bands only; colours follow the light/dark theme
   - Profiles auto-save to `localStorage`
 - **Compare**: Homepage → select players → “Compare selected players”
 

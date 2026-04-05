@@ -11,14 +11,14 @@ export default function PlayersPageClient() {
   if (players.length === 0) {
     return (
       <div className="mx-auto max-w-3xl space-y-4 p-6 text-[oklch(var(--text))]">
-        <h1 className="text-xl font-semibold">Players</h1>
-        <p className="text-sm text-[oklch(var(--text))]/80">
+        <h1 className="text-2xl font-black uppercase">Players</h1>
+        <p className="text-sm text-[oklch(var(--text))]/75">
           No players imported yet. Load a CSV on the homepage to browse and open
           profiles here.
         </p>
         <Link
           href="/"
-          className="inline-flex text-sm font-medium text-[oklch(var(--primary))] hover:underline"
+          className="inline-flex font-bold text-sm text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
         >
           Go to import
         </Link>

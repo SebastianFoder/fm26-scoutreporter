@@ -5,6 +5,7 @@ import type { PlayerWithGroups } from "../../data/players-store";
 import type { AttributeKey } from "../../types/weights";
 import { computeScore, getPlayerAttributeValue } from "../../lib/scoring";
 import {
+  attributeBandColor,
   getBandForValue,
   useActiveAttributeProfile,
 } from "../../components/AttributeColorConfig";
@@ -160,21 +161,21 @@ function SortableTh({
     <th
       scope="col"
       aria-sort={ariaSort}
-      className={`px-3 py-2 ${align === "left" ? "text-left" : "text-right"}`}
+      className={`border-b-2 border-[oklch(var(--border))] px-3 py-2.5 ${align === "left" ? "text-left" : "text-right"}`}
     >
       <button
         type="button"
         onClick={onSort}
-        className={`inline-flex w-full items-center gap-1 rounded-lg px-1 py-0.5 text-sm font-medium text-[oklch(var(--text))] hover:bg-[oklch(var(--text))]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--primary))]/50 ${
+        className={`inline-flex w-full items-center gap-1 rounded-lg px-1 py-0.5 text-xs font-black uppercase tracking-wider text-[oklch(var(--text))] hover:bg-[oklch(var(--text))]/10 focus:outline-none focus-visible:ring-3 focus-visible:ring-[oklch(var(--primary))] ${
           align === "right" ? "justify-end" : "justify-start"
         }`}
       >
-        <span className="capitalize">{label}</span>
+        <span>{label}</span>
         {active &&
           (listSortDir === "asc" ? (
-            <ArrowUp className="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden />
+            <ArrowUp className="h-3.5 w-3.5 shrink-0" aria-hidden />
           ) : (
-            <ArrowDown className="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden />
+            <ArrowDown className="h-3.5 w-3.5 shrink-0" aria-hidden />
           ))}
       </button>
     </th>
@@ -187,7 +188,7 @@ function NewTabPlayerLink({ uniqueId, name }: { uniqueId: string; name: string }
       href={`/players/${uniqueId}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex shrink-0 rounded-lg p-1 text-[oklch(var(--text))]/55 hover:bg-[oklch(var(--text))]/10 hover:text-[oklch(var(--primary))]"
+      className="inline-flex shrink-0 rounded-lg border-2 border-transparent p-1 text-[oklch(var(--text))]/55 hover:border-[oklch(var(--border))] hover:text-[oklch(var(--primary))]"
       aria-label={`Open ${name} in new tab`}
       title="Open in new tab"
     >
@@ -312,13 +313,13 @@ function PlayersListClientInner({
 
   return (
     <div className="mx-auto max-w-5xl space-y-5 p-6 text-[oklch(var(--text))]">
-      <h1 className="text-xl font-semibold">Players</h1>
+      <h1 className="text-2xl font-black uppercase tracking-tight">Players</h1>
 
-      <div className="overflow-x-auto rounded-2xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 shadow-sm">
+      <div className="overflow-x-auto rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] shadow-[4px_4px_0_oklch(var(--border))]">
         <table className="min-w-full text-sm">
-          <thead className="bg-[oklch(var(--text))]/10">
+          <thead className="bg-[oklch(var(--border))]/10">
             <tr>
-              {selectable && <th className="px-3 py-2 text-left"></th>}
+              {selectable && <th className="border-b-2 border-[oklch(var(--border))] px-3 py-2.5 text-left"></th>}
               <SortableTh
                 label="Player"
                 align="left"
@@ -360,46 +361,45 @@ function PlayersListClientInner({
             {pageItems.map(({ p, score }) => (
               <tr
                 key={p.raw.uniqueId}
-                className={`border-b border-[oklch(var(--text))]/40 ${
+                className={`border-b-2 border-[oklch(var(--border))]/30 ${
                   selectable && selectedIds.includes(p.raw.uniqueId)
-                    ? "bg-[oklch(var(--primary))]/25"
+                    ? "bg-[oklch(var(--primary))]/20"
                     : ""
                 }`}
               >
                 {selectable && (
-                  <td className="px-3 py-1.5">
+                  <td className="px-3 py-2">
                     <input
                       type="checkbox"
-                      className="h-4 w-4"
+                      className="h-4 w-4 accent-[oklch(var(--primary))]"
                       checked={selectedIds.includes(p.raw.uniqueId)}
                       onChange={() => onToggleSelect?.(p.raw.uniqueId)}
                     />
                   </td>
                 )}
-                <td className="px-3 py-1.5">
+                <td className="px-3 py-2">
                   <div className="flex items-center gap-1">
                     <Link
                       href={`/players/${p.raw.uniqueId}`}
-                      className="hover:underline"
+                      className="font-bold underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--primary))]"
                     >
                       {p.raw.player}
                     </Link>
                     <NewTabPlayerLink uniqueId={p.raw.uniqueId} name={p.raw.player} />
                   </div>
                 </td>
-                <td className="px-3 py-1.5">{p.raw.position}</td>
-                <td className="px-3 py-1.5 text-right font-semibold">
+                <td className="px-3 py-2 font-mono text-xs uppercase">{p.raw.position}</td>
+                <td className="px-3 py-2 text-right font-mono text-sm font-black">
                   {score.toFixed(2)}
                 </td>
                 {highlighted.map((key) => {
                   const value = getPlayerAttributeValue(p, key);
                   const band = getBandForValue(value, profile.thresholds);
-                  const color = profile.colors[band];
                   return (
                     <td
                       key={key}
-                      className="px-3 py-1.5 text-right font-mono text-xs"
-                      style={{ color }}
+                      className="px-3 py-2 text-right font-mono text-xs font-bold"
+                      style={{ color: attributeBandColor(band) }}
                     >
                       {value}
                     </td>

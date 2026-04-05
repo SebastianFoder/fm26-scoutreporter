@@ -37,7 +37,6 @@ export default function CompareClient({
   const highlightedKeys =
     highlighted.length > 0 ? highlighted : FALLBACK_HIGHLIGHTED_KEYS;
 
-  // Debounce search and reset pagination together
   useEffect(() => {
     const t = window.setTimeout(() => {
       setDebouncedQuery(query);
@@ -83,7 +82,6 @@ export default function CompareClient({
     );
   };
 
-  // Debounced capture: how many players people compare
   useEffect(() => {
     const count = selectedIds.length;
     if (count < 2) return;
@@ -97,8 +95,8 @@ export default function CompareClient({
     <div className="mx-auto max-w-6xl space-y-6 p-6 text-[oklch(var(--text))]">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">Compare</h1>
-          <p className="text-sm text-[oklch(var(--text))]/80">
+          <h1 className="text-3xl font-black uppercase tracking-tight">Compare</h1>
+          <p className="text-sm text-[oklch(var(--text))]/75">
             Pick players to compare. Gold/silver/bronze are awarded per row
             relative to the selected players.
           </p>
@@ -131,11 +129,11 @@ export default function CompareClient({
       </header>
 
       {/* Selection */}
-      <section className="rounded-2xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 p-4 shadow-sm">
+      <section className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] p-4 shadow-[4px_4px_0_oklch(var(--border))]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <h2 className="text-sm font-semibold">Selected</h2>
-            <p className="text-xs text-[oklch(var(--text))]/70">
+            <h2 className="text-sm font-black uppercase tracking-wide">Selected</h2>
+            <p className="font-mono text-xs text-[oklch(var(--text))]/70">
               {selectedIds.length} selected
             </p>
           </div>
@@ -143,7 +141,7 @@ export default function CompareClient({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, position, or ID…"
-            className="w-full rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-3 py-2 text-sm outline-none placeholder:text-[oklch(var(--text))]/55 focus:border-[oklch(var(--primary))]/60 sm:max-w-sm"
+            className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 py-2 text-sm outline-none placeholder:text-[oklch(var(--text))]/55 focus:ring-3 focus:ring-[oklch(var(--primary))] sm:max-w-sm"
           />
         </div>
 
@@ -154,38 +152,38 @@ export default function CompareClient({
                 key={p.raw.uniqueId}
                 type="button"
                 onClick={() => toggleSelected(p.raw.uniqueId)}
-                className="inline-flex items-center gap-2 rounded-full border border-[oklch(var(--text))]/30 bg-[oklch(var(--text))]/5 px-3 py-1 text-xs hover:bg-[oklch(var(--text))]/10"
+                className="inline-flex items-center gap-2 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 py-1 text-xs font-bold shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))]"
               >
-                <span className="font-medium">{p.raw.player}</span>
-                <span className="text-[oklch(var(--text))]/65">
+                <span>{p.raw.player}</span>
+                <span className="font-mono text-[oklch(var(--text))]/65">
                   {p.raw.position}
                 </span>
-                <span className="text-[oklch(var(--text))]/55">×</span>
+                <span className="font-black text-[oklch(var(--red-bg))]">×</span>
               </button>
             ))}
           </div>
         )}
 
-        <div className="mt-4 max-h-72 overflow-y-auto rounded-xl border border-[oklch(var(--text))]/30">
-          <div className="divide-y divide-[oklch(var(--text))]/20">
+        <div className="mt-4 max-h-72 overflow-y-auto rounded-lg border-2 border-[oklch(var(--border))]">
+          <div className="divide-y-2 divide-[oklch(var(--border))]/20">
             {pagedPlayers.map((p) => {
               const checked = selectedIds.includes(p.raw.uniqueId);
               return (
                 <label
                   key={p.raw.uniqueId}
-                  className="flex cursor-pointer items-center justify-between gap-3 bg-[oklch(var(--text))]/5 px-3 py-2 hover:bg-[oklch(var(--text))]/10"
+                  className={`flex cursor-pointer items-center justify-between gap-3 px-3 py-2 hover:bg-[oklch(var(--primary))]/10 ${checked ? "bg-[oklch(var(--primary))]/15" : "bg-[oklch(var(--background))]"}`}
                 >
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">
+                    <div className="truncate text-sm font-bold">
                       {p.raw.player}
                     </div>
-                    <div className="truncate text-xs text-[oklch(var(--text))]/65">
+                    <div className="truncate font-mono text-xs text-[oklch(var(--text))]/65">
                       {p.raw.position} · {p.raw.uniqueId}
                     </div>
                   </div>
                   <input
                     type="checkbox"
-                    className="h-4 w-4"
+                    className="h-4 w-4 accent-[oklch(var(--primary))]"
                     checked={checked}
                     onChange={() => toggleSelected(p.raw.uniqueId)}
                   />
@@ -194,7 +192,7 @@ export default function CompareClient({
             })}
 
             {filteredPlayers.length === 0 && (
-              <div className="px-3 py-6 text-center text-sm text-[oklch(var(--text))]/70">
+              <div className="px-3 py-6 text-center text-sm font-bold text-[oklch(var(--text))]/70">
                 No players match that search.
               </div>
             )}
@@ -203,8 +201,8 @@ export default function CompareClient({
 
         {filteredPlayers.length > 0 && (
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-xs text-[oklch(var(--text))]/70">
-              Showing {(page - 1) * PAGE_SIZE + 1}–
+            <div className="font-mono text-xs text-[oklch(var(--text))]/70">
+              {(page - 1) * PAGE_SIZE + 1}–
               {Math.min(page * PAGE_SIZE, filteredPlayers.length)} of{" "}
               {filteredPlayers.length}
             </div>
@@ -218,8 +216,8 @@ export default function CompareClient({
               >
                 Prev
               </Button>
-              <div className="text-xs text-[oklch(var(--text))]/70">
-                Page {page} / {pageCount}
+              <div className="font-mono text-xs font-bold text-[oklch(var(--text))]/70">
+                {page} / {pageCount}
               </div>
               <Button
                 color="alt"
@@ -236,34 +234,34 @@ export default function CompareClient({
       </section>
 
       {selected.length > 0 && (
-        <section className="rounded-2xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 p-4 shadow-sm">
+        <section className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] p-4 shadow-[4px_4px_0_oklch(var(--border))]">
           <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-sm font-semibold">
+            <h2 className="text-sm font-black uppercase tracking-wide">
               Comparison ({selected.length})
             </h2>
-            <p className="text-xs text-[oklch(var(--text))]/70">
-              Rows: score + {highlightedKeys.length} highlighted attributes
+            <p className="font-mono text-xs text-[oklch(var(--text))]/70">
+              score + {highlightedKeys.length} attributes
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[oklch(var(--text))]/30">
+          <div className="overflow-x-auto rounded-lg border-2 border-[oklch(var(--border))]">
             <table className="min-w-full text-xs">
-              <thead className="bg-[oklch(var(--text))]/10">
+              <thead className="bg-[oklch(var(--border))]/10">
                 <tr>
-                  <th className="sticky left-0 z-10 px-3 py-2 text-left bg-[oklch(var(--text))]/10">
+                  <th className="sticky left-0 z-10 border-b-2 border-r-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-3 py-2.5 text-left text-xs font-black uppercase tracking-wider">
                     Metric
                   </th>
                   {scored.map(({ p }) => (
-                    <th key={p.raw.uniqueId} className="px-3 py-2 text-left">
-                      <div className="font-medium">
+                    <th key={p.raw.uniqueId} className="border-b-2 border-[oklch(var(--border))] px-3 py-2.5 text-left">
+                      <div className="font-bold">
                         <Link
                           href={`/players/${p.raw.uniqueId}`}
-                          className="hover:underline"
+                          className="underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--primary))]"
                         >
                           {p.raw.player}
                         </Link>
                       </div>
-                      <div className="text-[10px] text-[oklch(var(--text))/0.65]">
+                      <div className="font-mono text-[10px] text-[oklch(var(--text))/0.65]">
                         {p.raw.position}
                       </div>
                     </th>
@@ -271,8 +269,8 @@ export default function CompareClient({
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-[oklch(var(--text))]/30 bg-[oklch(var(--text))]/5">
-                  <td className="sticky left-0 z-10 px-3 py-2 font-semibold bg-[oklch(var(--text))]/5">
+                <tr className="border-b-2 border-[oklch(var(--border))]/30 bg-[oklch(var(--border))]/5">
+                  <td className="sticky left-0 z-10 border-r-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-3 py-2 font-black uppercase text-xs">
                     Weighted score
                   </td>
                   {(() => {
@@ -292,7 +290,7 @@ export default function CompareClient({
                         >
                           <span
                             className={[
-                              "font-mono text-sm font-semibold",
+                              "font-mono text-sm font-black",
                               medal ? medalTextClass[medal] : "",
                             ].join(" ")}
                           >
@@ -316,14 +314,14 @@ export default function CompareClient({
                     <tr
                       key={key}
                       className={[
-                        "border-b border-[oklch(var(--text))]/20 last:border-0",
+                        "border-b-2 border-[oklch(var(--border))]/15 last:border-0",
                         idx % 2 === 0
                           ? "bg-transparent"
-                          : "bg-[oklch(var(--text))]/5",
+                          : "bg-[oklch(var(--border))]/5",
                       ].join(" ")}
                     >
-                      <td className="sticky left-0 z-10 px-3 py-1.5 font-medium bg-inherit">
-                        <span className="capitalize">{key}</span>
+                      <td className="sticky left-0 z-10 border-r-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-3 py-2 font-bold uppercase text-xs">
+                        {key}
                       </td>
                       {scored.map(({ p }) => {
                         const v =
@@ -334,7 +332,7 @@ export default function CompareClient({
                           <td
                             key={p.raw.uniqueId + key}
                             className={[
-                              "px-3 py-1.5 text-right font-mono text-sm",
+                              "px-3 py-2 text-right font-mono text-sm",
                               medal
                                 ? medalTextClass[medal]
                                 : "text-[oklch(var(--text))]/85",
@@ -354,7 +352,7 @@ export default function CompareClient({
       )}
 
       {selected.length === 0 && (
-        <div className="rounded-2xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 p-6 text-sm text-[oklch(var(--text))]/75">
+        <div className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] p-6 text-sm font-bold text-[oklch(var(--text))]/75 shadow-[4px_4px_0_oklch(var(--border))]">
           Select at least 2 players above to start comparing.
         </div>
       )}
@@ -365,18 +363,16 @@ export default function CompareClient({
 type Medal = "gold" | "silver" | "bronze";
 
 const medalTextClass: Record<Medal, string> = {
-  gold: "text-[oklch(var(--gold-bg))] font-semibold",
-  silver: "text-[oklch(var(--silver-bg))] font-semibold",
-  bronze: "text-[oklch(var(--bronze-bg))] font-semibold",
+  gold: "text-[oklch(var(--gold-bg))] font-black",
+  silver: "text-[oklch(var(--silver-bg))] font-black",
+  bronze: "text-[oklch(var(--bronze-bg))] font-black",
 };
 
 function medalsByPlayerId(
   items: Array<{ id: string; value: number }>,
 ): Record<string, Medal | null> {
-  // Sort descending by value
   const sorted = [...items].sort((a, b) => b.value - a.value);
 
-  // Assign medals by distinct rank (ties share medals)
   const medals: Record<string, Medal | null> = Object.fromEntries(
     items.map((i) => [i.id, null]),
   );

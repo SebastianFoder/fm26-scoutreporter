@@ -21,7 +21,18 @@ export interface AttributeColorProfile {
     good: number;
     average: number;
   };
-  colors: Record<AttributeBand, string>; // CSS colors (e.g. hex)
+}
+
+const ATTR_BAND_VARS: Record<AttributeBand, string> = {
+  excellent: "--attr-excellent",
+  good: "--attr-good",
+  average: "--attr-average",
+  low: "--attr-low",
+};
+
+/** Resolved text color for an attribute band (follows light/dark theme). */
+export function attributeBandColor(band: AttributeBand): string {
+  return `oklch(var(${ATTR_BAND_VARS[band]}))`;
 }
 
 const STORAGE_KEY = "attributeColorProfiles";
@@ -34,17 +45,64 @@ const DEFAULT_PROFILE: AttributeColorProfile = {
     good: 11,
     average: 6,
   },
-  colors: {
-    excellent: "#34d399",
-    good: "#fbbf24",
-    average: "#9ca3af",
-    low: "#4b5563",
-  },
 };
 
 interface StoredConfig {
   activeId: string;
   profiles: AttributeColorProfile[];
+}
+
+function clampThreshold(n: number, fallback: number): number {
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(20, Math.max(0, Math.round(n)));
+}
+
+function parseProfile(raw: unknown): AttributeColorProfile | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  if (typeof o.id !== "string") return null;
+  const t = o.thresholds;
+  const tp = t && typeof t === "object" ? (t as Record<string, unknown>) : {};
+  return {
+    id: o.id,
+    name: typeof o.name === "string" ? o.name : "Profile",
+    thresholds: {
+      excellent: clampThreshold(
+        Number(tp.excellent),
+        DEFAULT_PROFILE.thresholds.excellent,
+      ),
+      good: clampThreshold(Number(tp.good), DEFAULT_PROFILE.thresholds.good),
+      average: clampThreshold(
+        Number(tp.average),
+        DEFAULT_PROFILE.thresholds.average,
+      ),
+    },
+  };
+}
+
+function migrateStoredConfig(parsed: unknown): StoredConfig {
+  const fallback: StoredConfig = {
+    activeId: DEFAULT_PROFILE.id,
+    profiles: [DEFAULT_PROFILE],
+  };
+  if (!parsed || typeof parsed !== "object") return fallback;
+  const o = parsed as Record<string, unknown>;
+  const rawProfiles = o.profiles;
+  if (!Array.isArray(rawProfiles) || rawProfiles.length === 0) return fallback;
+
+  const profiles = rawProfiles
+    .map(parseProfile)
+    .filter((p): p is AttributeColorProfile => p !== null);
+
+  if (profiles.length === 0) return fallback;
+
+  const activeId =
+    typeof o.activeId === "string" &&
+    profiles.some((p) => p.id === o.activeId)
+      ? o.activeId
+      : profiles[0].id;
+
+  return { activeId, profiles };
 }
 
 function loadFromStorage(): StoredConfig {
@@ -55,11 +113,7 @@ function loadFromStorage(): StoredConfig {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw)
       return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
-    const parsed = JSON.parse(raw) as StoredConfig;
-    if (!parsed.profiles?.length) {
-      return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
-    }
-    return parsed;
+    return migrateStoredConfig(JSON.parse(raw) as unknown);
   } catch {
     return { activeId: DEFAULT_PROFILE.id, profiles: [DEFAULT_PROFILE] };
   }
@@ -156,9 +210,9 @@ export function AttributeColorConfig() {
   const addProfile = () => {
     const id = `profile-${Date.now()}`;
     const next: AttributeColorProfile = {
-      ...active,
       id,
       name: `${active.name} Copy`,
+      thresholds: { ...active.thresholds },
     };
     setState((prev) => ({
       activeId: id,
@@ -183,20 +237,20 @@ export function AttributeColorConfig() {
         size="sm"
         onClick={() => setOpen((v) => !v)}
       >
-        Attribute Colors
+        Attribute thresholds
       </Button>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Attribute Colors"
-        description="Configure thresholds and colors for attribute values (1–20). Saved per profile."
+        title="Attribute thresholds"
+        description="Set numeric bands for attribute values (1–20). Colours follow the current light or dark theme. Saved per profile."
         size="lg"
       >
         <div className="space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <select
-                className="w-full rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-2 py-2 text-sm sm:w-56"
+                className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-2 text-sm font-bold shadow-[2px_2px_0_oklch(var(--border))] sm:w-56"
                 value={active.id}
                 onChange={(e) =>
                   setState((prev) => ({ ...prev, activeId: e.target.value }))
@@ -229,7 +283,7 @@ export function AttributeColorConfig() {
 
             <input
               type="text"
-              className="w-full rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-3 py-2 text-sm sm:w-64"
+              className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-3 py-2 text-sm font-bold shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))] sm:w-64"
               value={active.name}
               onChange={(e) =>
                 updateActive((p) => ({ ...p, name: e.target.value }))
@@ -238,118 +292,104 @@ export function AttributeColorConfig() {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <span className="text-[10px] font-semibold uppercase text-[oklch(var(--text))]/70">
+          <div className="grid grid-cols-[auto_1fr_auto] gap-x-3 gap-y-2 text-xs sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[oklch(var(--text))]/65">
               Band
             </span>
-            <span className="text-[10px] font-semibold uppercase text-[oklch(var(--text))]/70">
-              Threshold
+            <span className="text-[10px] font-black uppercase tracking-wider text-[oklch(var(--text))]/65">
+              Preview
             </span>
-            <span className="text-[10px] font-semibold uppercase text-[oklch(var(--text))]/70">
-              Color
+            <span className="text-[10px] font-black uppercase tracking-wider text-[oklch(var(--text))]/65">
+              Min value
             </span>
 
             {(
               ["excellent", "good", "average"] as const satisfies ReadonlyArray<
-                keyof typeof active.thresholds
+                keyof AttributeColorProfile["thresholds"]
               >
             ).map((band) => (
-              <FragmentRow
+              <ThresholdRow
                 key={band}
-                label={band}
-                value={active.thresholds[band]}
-                color={active.colors[band]}
+                band={band}
+                threshold={active.thresholds[band]}
                 onThresholdChange={(val) =>
                   updateActive((p) => ({
                     ...p,
                     thresholds: { ...p.thresholds, [band]: val },
                   }))
                 }
-                onColorChange={(val) =>
-                  updateActive((p) => ({
-                    ...p,
-                    colors: { ...p.colors, [band]: val },
-                  }))
-                }
               />
             ))}
 
-            <FragmentRow
-              label="low"
-              value={0}
-              color={active.colors.low}
+            <ThresholdRow
+              band="low"
               readOnlyThreshold
-              onColorChange={(val) =>
-                updateActive((p) => ({
-                  ...p,
-                  colors: { ...p.colors, low: val },
-                }))
-              }
+              belowMax={active.thresholds.average}
             />
           </div>
-
-          <p className="text-xs text-[oklch(var(--text))]/70">
-            Colors are hex values like{" "}
-            <code className="font-mono">#34d399</code>.
-          </p>
         </div>
       </Modal>
     </div>
   );
 }
 
-function FragmentRow(props: {
-  label: string;
-  value: number;
-  color: string;
+function ThresholdRow(props: {
+  band: AttributeBand;
+  threshold?: number;
   readOnlyThreshold?: boolean;
+  /** For low band: show “below &lt;this&gt;” */
+  belowMax?: number;
   onThresholdChange?: (value: number) => void;
-  onColorChange?: (value: string) => void;
 }) {
-  const {
-    label,
-    value,
-    color,
-    readOnlyThreshold,
-    onThresholdChange,
-    onColorChange,
-  } = props;
+  const { band, readOnlyThreshold, belowMax, onThresholdChange } = props;
+  const threshold = props.threshold ?? 0;
 
   const pretty =
-    label[0].toUpperCase() + label.slice(1).toLowerCase() + " Attribute";
+    band[0].toUpperCase() + band.slice(1).toLowerCase() + " attribute";
+
+  const swatchStyle = {
+    backgroundColor: attributeBandColor(band),
+  };
 
   return (
     <>
-      <span className="py-1 text-[11px]">{pretty}</span>
+      <span className="flex items-center gap-2 py-1 text-[11px]">
+        <span
+          className="h-3 w-3 shrink-0 rounded border-2 border-[oklch(var(--border))] shadow-[1px_1px_0_oklch(var(--border))]"
+          style={swatchStyle}
+          aria-hidden
+        />
+        {pretty}
+      </span>
+      <span className="flex items-center py-1">
+        <span
+          className="rounded-lg border-2 border-[oklch(var(--border))] px-2 py-0.5 font-mono text-[11px] font-bold shadow-[1px_1px_0_oklch(var(--border))]"
+          style={{ color: attributeBandColor(band) }}
+        >
+          Aa
+        </span>
+      </span>
       <span className="py-1">
         {readOnlyThreshold ? (
           <span className="text-[11px] text-[oklch(var(--text))/0.7]">
-            0–{value}
+            {belowMax !== undefined ? (
+              <>
+                Below <span className="font-mono font-bold">{belowMax}</span>
+              </>
+            ) : (
+              <>—</>
+            )}
           </span>
         ) : (
           <input
             type="number"
             min={0}
             max={20}
-            className="w-14 rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-1 py-0.5 text-right text-[11px]"
-            value={value}
+            className="w-14 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-1 py-0.5 text-right font-mono text-[11px] shadow-[1px_1px_0_oklch(var(--border))]"
+            value={threshold}
             onChange={(e) => onThresholdChange?.(Number(e.target.value) || 0)}
           />
         )}
-      </span>
-      <span className="flex items-center gap-1 py-1">
-        <input
-          type="color"
-          className="h-6 w-10 cursor-pointer rounded-xl border border-[oklch(var(--text))]/40 bg-transparent p-0"
-          value={color}
-          onChange={(e) => onColorChange?.(e.target.value)}
-        />
-        <input
-          type="text"
-          className="flex-1 rounded-xl border border-[oklch(var(--text))]/40 bg-[oklch(var(--text))]/10 px-1 py-0.5 text-[11px]"
-          value={color}
-          onChange={(e) => onColorChange?.(e.target.value)}
-        />
       </span>
     </>
   );

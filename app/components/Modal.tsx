@@ -45,7 +45,6 @@ export function Modal({
     if (!open) return;
     lastActiveRef.current = document.activeElement as HTMLElement | null;
 
-    // focus the modal panel after mount
     const t = window.setTimeout(() => {
       panelRef.current?.focus();
     }, 0);
@@ -67,7 +66,6 @@ export function Modal({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, closeOnEsc, onClose]);
 
-  // lock background scroll when open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -82,10 +80,9 @@ export function Modal({
 
   return createPortal(
     <div className="fixed inset-0 z-50">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      {/* Solid overlay -- no blur for neo-brutalist rawness */}
+      <div className="absolute inset-0 bg-[oklch(var(--text))]/50" />
 
-      {/* Panel wrapper */}
       <div
         className="absolute inset-0 flex items-center justify-center p-4"
         onMouseDown={(e) => {
@@ -107,14 +104,14 @@ export function Modal({
           className={[
             "w-full",
             sizeClass[size],
-            "flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-[oklch(var(--text))] bg-[oklch(var(--background))] shadow-2xl outline-none",
+            "flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-lg border-3 border-[oklch(var(--border))] bg-[oklch(var(--background))] shadow-[6px_6px_0_oklch(var(--border))] outline-none",
           ].join(" ")}
         >
           {(title || description) && (
-            <div className="flex items-start justify-between gap-4 border-b border-[oklch(var(--text))]/40 px-5 py-4">
+            <div className="flex items-start justify-between gap-4 border-b-3 border-[oklch(var(--border))] px-5 py-4">
               <div>
                 {title && (
-                  <h2 id={titleId} className="text-lg font-semibold">
+                  <h2 id={titleId} className="text-xl font-black uppercase tracking-tight">
                     {title}
                   </h2>
                 )}
@@ -142,7 +139,7 @@ export function Modal({
           <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
           {footer && (
-            <div className="shrink-0 border-t border-[oklch(var(--text))]/40 px-5 py-4">
+            <div className="shrink-0 border-t-3 border-[oklch(var(--border))] px-5 py-4">
               {footer}
             </div>
           )}
