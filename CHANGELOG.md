@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.2.0...v1.2.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* **players:** preserve scroll and clamp page on list URL updates ([faafb89](https://github.com/SebastianFoder/fm26-scoutreporter/commit/faafb890ab0d52266957a5f9017c282e74baee6f))
+
 # [1.2.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.1.0...v1.2.0) (2026-04-05)
 
 
