@@ -1,5 +1,5 @@
-import type { GroupedAttributes } from "../types/grouped-attributes";
-import type { AttributeKey } from "../types/weights";
+import type { GroupedAttributes } from "@/types/grouped-attributes";
+import type { AttributeKey } from "@/types/weights";
 
 export function getGroupedAttributeValue(
   grouped: GroupedAttributes,

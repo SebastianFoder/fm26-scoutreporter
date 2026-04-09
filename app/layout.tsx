@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { Outfit, Space_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeSwitcher } from "./components/ThemeSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import {
   AttributeColorConfig,
   AttributeColorProvider,
-} from "./components/AttributeColorConfig";
+} from "@/components/AttributeColorConfig";
 import Link from "next/link";
-import { WeightProvider } from "./components/WeightConfig";
-import { PlayersDataProvider } from "./components/PlayersDataProvider";
-import { HighlightedAttributesProvider } from "./components/HighlightedAttributesConfig";
+import { WeightProvider } from "@/components/WeightConfig";
+import { PlayersDataProvider } from "@/components/PlayersDataProvider";
+import { HighlightedAttributesProvider } from "@/components/HighlightedAttributesConfig";
 import {
   AnalyticsConsentProvider,
   AnalyticsPreferencesLink,
-} from "./components/AnalyticsConsent";
-import { MoneyballDataProvider } from "./moneyball/MoneyballDataProvider";
+} from "@/components/AnalyticsConsent";
+import { MoneyballDataProvider } from "@/features/moneyball/MoneyballDataProvider";
 
 const outfit = Outfit({
   variable: "--font-outfit",

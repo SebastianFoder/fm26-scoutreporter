@@ -9,7 +9,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import type { AttributeKey } from "../types/weights";
+import type { AttributeKey } from "@/types/weights";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 import { useAnalytics } from "./AnalyticsConsent";

@@ -13,7 +13,7 @@ import type {
   AttributeKey,
   AttributeWeights,
   WeightProfile,
-} from "../types/weights";
+} from "@/types/weights";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 import { useAnalytics } from "./AnalyticsConsent";

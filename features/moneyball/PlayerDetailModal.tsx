@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "../components/Button";
-import { Modal } from "../components/Modal";
+import { Button } from "@/components/Button";
+import { Modal } from "@/components/Modal";
 import type { MoneyballStat } from "./moneyball-stat";
 import type { MoneyballRow } from "./types";
 import { PolarPercentileChart } from "./PolarPercentileChart";
@@ -38,6 +38,7 @@ export function PlayerDetailModal({
 
   useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset focus when modal closes
       setFocusedSectionId(null);
       return;
     }

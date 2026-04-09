@@ -10,7 +10,7 @@ This project follows a **neo-brutalist** design system: bold borders, hard offse
 ## Tech Stack Context
 
 - **Tailwind CSS v4** (configured via `app/globals.css`, no `tailwind.config.*`)
-- **OKLCH color system** via CSS custom properties set at runtime by `app/themes.ts`
+- **OKLCH color system** via CSS custom properties set at runtime by `lib/themes.ts`
 - **Next.js App Router** with `"use client"` for interactive components
 - **Outfit** (400–900) + **Space Mono** fonts
 
@@ -100,7 +100,7 @@ active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
 transition-all
 ```
 
-Use the `Button` component from `app/components/Button.tsx`. It handles color, variant (solid/outline/ghost), and size (sm/md/lg).
+Use the `Button` component from `components/Button.tsx`. It handles color, variant (solid/outline/ghost), and size (sm/md/lg).
 
 ### Input / Select
 
@@ -112,7 +112,7 @@ focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]
 
 ### Modal
 
-Use the `Modal` component from `app/components/Modal.tsx`. It applies:
+Use the `Modal` component from `components/Modal.tsx`. It applies:
 - `border-3` panel border
 - `shadow-[6px_6px_0]` hard shadow
 - Solid overlay (no backdrop blur)
@@ -150,11 +150,11 @@ overflow-x-auto rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(
 
 ## Theme System
 
-Themes live in `app/themes.ts`. Each `ThemeConfig` has: `primary`, `text`, `alt`, `background`, `surface`, `border`, `attributeBands` (FM attribute value text colours), and `specials` (medal colours). `applyTheme()` sets CSS vars on `:root`.
+Themes live in `lib/themes.ts`. Each `ThemeConfig` has: `primary`, `text`, `alt`, `background`, `surface`, `border`, `attributeBands` (FM attribute value text colours), and `specials` (medal colours). `applyTheme()` sets CSS vars on `:root`.
 
 When adding new tokens, update both:
 1. `:root` defaults in `app/globals.css`
-2. `ThemeConfig` interface + both theme objects + `applyTheme()` in `app/themes.ts`
+2. `ThemeConfig` interface + both theme objects + `applyTheme()` in `lib/themes.ts`
 
 FM attribute value colours use `--attr-excellent`, `--attr-good`, `--attr-average`, `--attr-low` (set per theme). Users only edit thresholds in `AttributeColorConfig`; do not store per-user colours.
 

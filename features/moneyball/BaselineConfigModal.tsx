@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "../components/Button";
-import { Modal } from "../components/Modal";
+import { Button } from "@/components/Button";
+import { Modal } from "@/components/Modal";
 import { useMoneyball } from "./MoneyballDataProvider";
 
 export function BaselineConfigModal({

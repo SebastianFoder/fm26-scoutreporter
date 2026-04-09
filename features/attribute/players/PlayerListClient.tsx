@@ -10,16 +10,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { PlayerWithGroups } from "../../data/players-store";
-import type { AttributeKey } from "../../types/weights";
-import { computeScore, getPlayerAttributeValue } from "../../lib/scoring";
+import type { PlayerWithGroups } from "@/data/players-store";
+import type { AttributeKey } from "@/types/weights";
+import { computeScore, getPlayerAttributeValue } from "@/lib/scoring";
 import {
   attributeBandColor,
   getBandForValue,
   useActiveAttributeProfile,
-} from "../../components/AttributeColorConfig";
-import { useActiveWeights } from "../../components/WeightConfig";
-import { useHighlightedAttributes } from "../../components/HighlightedAttributesConfig";
+} from "@/components/AttributeColorConfig";
+import { useActiveWeights } from "@/components/WeightConfig";
+import { useHighlightedAttributes } from "@/components/HighlightedAttributesConfig";
 import Link from "next/link";
 import { ArrowDown, ArrowUp, ExternalLink, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -28,7 +28,7 @@ import {
   parsePageParam,
   parsePageSizeParam,
   type PageSizeChoice,
-} from "../../components/PaginationControls";
+} from "@/components/PaginationControls";
 
 interface Props {
   players: PlayerWithGroups[];

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import PlayersListClient from "../(views)/players/PlayerListClient";
+import PlayersListClient from "@/features/attribute/players/PlayerListClient";
 import { WeightConfigModal } from "./WeightConfig";
 import { Button } from "./Button";
 import { usePlayersData } from "./PlayersDataProvider";

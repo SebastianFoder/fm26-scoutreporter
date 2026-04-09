@@ -1,4 +1,4 @@
-import { PlayerAttributes } from "../types/player-attributes";
+import { PlayerAttributes } from "@/types/player-attributes";
 
 export function parsePlayersCsv(csv: string): PlayerAttributes[] {
   const lines = csv

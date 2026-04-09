@@ -1,5 +1,5 @@
-import type { PlayerWithGroups } from "../data/players-store";
-import type { AttributeWeights, AttributeKey } from "../types/weights";
+import type { PlayerWithGroups } from "@/data/players-store";
+import type { AttributeWeights, AttributeKey } from "@/types/weights";
 
 const DEFAULT_WEIGHT = 0;
 const BASELINE_AVG_ATTRIBUTE = 13;

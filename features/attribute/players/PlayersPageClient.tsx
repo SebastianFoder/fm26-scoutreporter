@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import PlayersListClient from "./PlayerListClient";
-import { usePlayersData } from "../../components/PlayersDataProvider";
+import { usePlayersData } from "@/components/PlayersDataProvider";
 
 export default function PlayersPageClient() {
   const { state } = usePlayersData();

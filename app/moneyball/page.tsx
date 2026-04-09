@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Button } from "../components/Button";
-import { BaselineConfigModal } from "./BaselineConfigModal";
-import { useMoneyball } from "./MoneyballDataProvider";
-import { MoneyballPlayersTable } from "./MoneyballPlayersTable";
-import { MoneyballWeightsConfig } from "./MoneyballWeightsConfig";
+import { Button } from "@/components/Button";
+import { BaselineConfigModal } from "@/features/moneyball/BaselineConfigModal";
+import { useMoneyball } from "@/features/moneyball/MoneyballDataProvider";
+import { MoneyballPlayersTable } from "@/features/moneyball/MoneyballPlayersTable";
+import { MoneyballWeightsConfig } from "@/features/moneyball/MoneyballWeightsConfig";
 
 function MoneyballModeContent() {
   const [baselineOpen, setBaselineOpen] = useState(false);

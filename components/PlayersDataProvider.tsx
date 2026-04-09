@@ -10,10 +10,10 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import { parsePlayersCsv } from "../parser/csv-parser";
-import { groupPlayerAttributes } from "../parser/attribute-grouper";
-import type { PlayerAttributes } from "../types/player-attributes";
-import type { GroupedAttributes } from "../types/grouped-attributes";
+import { parsePlayersCsv } from "@/lib/parser/csv-parser";
+import { groupPlayerAttributes } from "@/lib/parser/attribute-grouper";
+import type { PlayerAttributes } from "@/types/player-attributes";
+import type { GroupedAttributes } from "@/types/grouped-attributes";
 import { useAnalytics } from "./AnalyticsConsent";
 
 export interface PlayerWithGroups {

@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button } from "../components/Button";
-import { Modal } from "../components/Modal";
+import { Button } from "@/components/Button";
+import { Modal } from "@/components/Modal";
 import { defaultGroupWeightsForRole } from "./default-weights";
 import { useMoneyball } from "./MoneyballDataProvider";
 import { getStatLabel } from "./stat-labels";

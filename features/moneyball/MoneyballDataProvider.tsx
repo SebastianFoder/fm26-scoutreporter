@@ -223,6 +223,7 @@ export function MoneyballDataProvider({
 
   useEffect(() => {
     if (loading) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prune profile when role group definitions change
     setWeightsProfile((prev) => {
       const validOut = new Set(roleGroups.outfield.map((g) => g.id));
       const validGk = new Set(roleGroups.gk.map((g) => g.id));

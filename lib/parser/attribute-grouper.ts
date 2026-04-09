@@ -1,5 +1,5 @@
-import type { PlayerAttributes } from "../types/player-attributes";
-import type { GroupedAttributes } from "../types/grouped-attributes";
+import type { PlayerAttributes } from "@/types/player-attributes";
+import type { GroupedAttributes } from "@/types/grouped-attributes";
 
 export function groupPlayerAttributes(
   player: PlayerAttributes,

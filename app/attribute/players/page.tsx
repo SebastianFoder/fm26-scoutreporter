@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import PlayersPageClient from "../../(views)/players/PlayersPageClient";
+import PlayersPageClient from "@/features/attribute/players/PlayersPageClient";
 
 export default function AttributePlayersPage() {
   return (

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import CompareClient from "./CompareClient";
-import { usePlayersData } from "../../components/PlayersDataProvider";
+import { usePlayersData } from "@/components/PlayersDataProvider";
 
 export default function ComparePageClient() {
   const searchParams = useSearchParams();

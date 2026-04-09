@@ -9,8 +9,9 @@ export default function Home() {
             Scout Reporter Modes
           </h1>
           <p className="max-w-2xl text-sm text-[oklch(var(--text))/0.75]">
-            Choose a mode to continue. Attribute mode keeps the current
-            workflow. Moneyball mode is being prepared.
+            Choose a mode to continue. Attribute mode scores and compares players
+            from attribute exports; Moneyball mode uses stats baselines and
+            weighted role-group metrics.
           </p>
         </header>
 
@@ -38,15 +39,16 @@ export default function Home() {
               Moneyball Mode
             </h2>
             <p className="mt-2 text-sm text-[oklch(var(--text))/0.8]">
-              Stats-first workflow is coming next. The route is available as a
-              placeholder.
+              Build baseline percentiles from stats exports, import player-view
+              CSVs, and compare players using configurable group and stat
+              weights.
             </p>
             <div className="mt-4">
               <Link
                 href="/moneyball"
-                className="inline-flex rounded-lg border-2 border-[oklch(var(--border))] bg-transparent px-4 py-2 text-sm font-bold text-[oklch(var(--text))] shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                className="inline-flex rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--primary))] px-4 py-2 text-sm font-bold text-[oklch(var(--background))] shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
               >
-                Open Moneyball Placeholder
+                Open Moneyball Mode
               </Link>
             </div>
           </article>

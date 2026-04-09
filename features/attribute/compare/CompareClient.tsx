@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { PlayerWithGroups } from "../../data/players-store";
-import type { AttributeKey } from "../../types/weights";
-import { computeScore } from "../../lib/scoring";
-import { useActiveWeights } from "../../components/WeightConfig";
-import { useHighlightedAttributes } from "../../components/HighlightedAttributesConfig";
+import type { PlayerWithGroups } from "@/data/players-store";
+import type { AttributeKey } from "@/types/weights";
+import { computeScore } from "@/lib/scoring";
+import { useActiveWeights } from "@/components/WeightConfig";
+import { useHighlightedAttributes } from "@/components/HighlightedAttributesConfig";
 import Link from "next/link";
-import { useAnalytics } from "../../components/AnalyticsConsent";
-import { Button } from "../../components/Button";
-import { getGroupedAttributeValue } from "../../lib/grouped-attribute-value";
+import { useAnalytics } from "@/components/AnalyticsConsent";
+import { Button } from "@/components/Button";
+import { getGroupedAttributeValue } from "@/lib/grouped-attribute-value";
 
 interface Props {
   players: PlayerWithGroups[];

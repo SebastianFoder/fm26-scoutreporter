@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { applyTheme, DEFAULT_THEME_KEY, type ThemeKey } from "../themes";
+import { applyTheme, DEFAULT_THEME_KEY, type ThemeKey } from "@/lib/themes";
 import { Button } from "./Button";
 
 const STORAGE_KEY = "theme";

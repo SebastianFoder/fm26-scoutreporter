@@ -3,8 +3,8 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { PlayerAttributesClient } from "../../../(views)/players/PlayerAttributesClient";
-import { usePlayersData } from "../../../components/PlayersDataProvider";
+import { PlayerAttributesClient } from "@/features/attribute/players/PlayerAttributesClient";
+import { usePlayersData } from "@/components/PlayersDataProvider";
 
 export default function AttributePlayerPage() {
   const { state } = usePlayersData();

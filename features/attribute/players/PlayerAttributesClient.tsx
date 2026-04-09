@@ -1,13 +1,13 @@
 "use client";
 
-import type { GroupedAttributes } from "../../types/grouped-attributes";
+import type { GroupedAttributes } from "@/types/grouped-attributes";
 import {
   attributeBandColor,
   getBandForValue,
   useActiveAttributeProfile,
-} from "../../components/AttributeColorConfig";
-import type { AttributeKey } from "../../types/weights";
-import { getGroupedAttributeValue } from "../../lib/grouped-attribute-value";
+} from "@/components/AttributeColorConfig";
+import type { AttributeKey } from "@/types/weights";
+import { getGroupedAttributeValue } from "@/lib/grouped-attribute-value";
 
 interface Props {
   grouped: GroupedAttributes;

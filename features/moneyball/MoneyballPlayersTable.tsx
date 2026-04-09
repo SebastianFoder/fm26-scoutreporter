@@ -11,13 +11,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Button } from "../components/Button";
+import { Button } from "@/components/Button";
 import {
   PaginationControls,
   parsePageParam,
   parsePageSizeParam,
   type PageSizeChoice,
-} from "../components/PaginationControls";
+} from "@/components/PaginationControls";
 import {
   averagePercentileForGroup,
   percentileVectorForStatKeyOrder,
@@ -172,6 +172,7 @@ export function MoneyballPlayersTable() {
   const urlPage = parsePageParam(searchParams.get("page"));
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- keep draft in sync with URL ?q=
     setDraft((searchParams.get("q") ?? "").trim());
   }, [searchParams]);
 

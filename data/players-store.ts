@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { parsePlayersCsv } from "../parser/csv-parser";
-import { groupPlayerAttributes } from "../parser/attribute-grouper";
-import type { PlayerAttributes } from "../types/player-attributes";
-import type { GroupedAttributes } from "../types/grouped-attributes";
+import { parsePlayersCsv } from "@/lib/parser/csv-parser";
+import { groupPlayerAttributes } from "@/lib/parser/attribute-grouper";
+import type { PlayerAttributes } from "@/types/player-attributes";
+import type { GroupedAttributes } from "@/types/grouped-attributes";
 
 export interface PlayerWithGroups {
   raw: PlayerAttributes;
