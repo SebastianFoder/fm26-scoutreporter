@@ -1,10 +1,5 @@
-import { Suspense } from "react";
-import PlayersPageClient from "./PlayersPageClient";
+import { redirect } from "next/navigation";
 
-export default function PlayersPage() {
-  return (
-    <Suspense fallback={null}>
-      <PlayersPageClient />
-    </Suspense>
-  );
+export default function PlayersLegacyPage() {
+  redirect("/attribute/players");
 }

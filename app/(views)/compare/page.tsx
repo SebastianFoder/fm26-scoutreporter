@@ -1,10 +1,5 @@
-import { Suspense } from "react";
-import ComparePageClient from "./ComparePageClient";
+import { redirect } from "next/navigation";
 
-export default function ComparePage() {
-  return (
-    <Suspense fallback={null}>
-      <ComparePageClient />
-    </Suspense>
-  );
+export default function CompareLegacyPage() {
+  redirect("/attribute/compare");
 }

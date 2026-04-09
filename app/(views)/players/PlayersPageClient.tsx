@@ -17,7 +17,7 @@ export default function PlayersPageClient() {
           profiles here.
         </p>
         <Link
-          href="/"
+          href="/attribute"
           className="inline-flex font-bold text-sm text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
         >
           Go to import

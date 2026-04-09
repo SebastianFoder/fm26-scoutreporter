@@ -75,7 +75,7 @@ export default function HowToUsePage() {
           </p>
           <div className="text-sm">
             <Link
-              href="/"
+              href="/attribute"
               className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
             >
               Go to the importer
@@ -207,7 +207,7 @@ export default function HowToUsePage() {
             <p>
               Go to{" "}
               <Link
-                href="/"
+                href="/attribute"
                 className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
               >
                 this site&apos;s importer

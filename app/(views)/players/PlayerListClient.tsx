@@ -259,7 +259,7 @@ function SortableTh({
 function NewTabPlayerLink({ uniqueId, name }: { uniqueId: string; name: string }) {
   return (
     <Link
-      href={`/players/${uniqueId}`}
+      href={`/attribute/players/${uniqueId}`}
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex shrink-0 rounded-lg border-2 border-transparent p-1 text-[oklch(var(--text))]/55 hover:border-[oklch(var(--border))] hover:text-[oklch(var(--primary))]"
@@ -546,7 +546,7 @@ function PlayersListClientInner({
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-1">
                     <Link
-                      href={`/players/${p.raw.uniqueId}`}
+                      href={`/attribute/players/${p.raw.uniqueId}`}
                       className="font-bold underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--primary))]"
                     >
                       {p.raw.player}

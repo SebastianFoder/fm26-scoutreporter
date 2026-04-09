@@ -1,7 +1,7 @@
 import type { PlayerWithGroups } from "../data/players-store";
 import type { AttributeWeights, AttributeKey } from "../types/weights";
 
-const DEFAULT_WEIGHT = 1;
+const DEFAULT_WEIGHT = 0;
 const BASELINE_AVG_ATTRIBUTE = 13;
 
 /** >1 makes high/low weight ratios affect the score more strongly (flat profiles unchanged). */

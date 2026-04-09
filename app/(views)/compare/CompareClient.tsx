@@ -255,7 +255,7 @@ export default function CompareClient({
                     <th key={p.raw.uniqueId} className="border-b-2 border-[oklch(var(--border))] px-3 py-2.5 text-left">
                       <div className="font-bold">
                         <Link
-                          href={`/players/${p.raw.uniqueId}`}
+                          href={`/attribute/players/${p.raw.uniqueId}`}
                           className="underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--primary))]"
                         >
                           {p.raw.player}

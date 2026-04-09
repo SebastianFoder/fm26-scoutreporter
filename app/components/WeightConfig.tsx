@@ -20,7 +20,7 @@ import { useAnalytics } from "./AnalyticsConsent";
 
 const STORAGE_KEY = "weightProfiles";
 
-/** Upper bound for per-attribute weight inputs and stored values (wider ratio vs min 1). */
+/** Upper bound for per-attribute weight inputs and stored values (wider ratio vs min 0). */
 const WEIGHT_MAX = 20;
 
 const DEFAULT_PROFILE: WeightProfile = {
@@ -117,7 +117,7 @@ export function WeightProvider({ children }: { children: React.ReactNode }) {
     // Capture per-attribute weights for the active profile
     const weights = withNormalizedWeights(active).weights;
     const weightsByAttribute = Object.fromEntries(
-      ALL_KEYS.map((k) => [k, weights[k] ?? 1]),
+      ALL_KEYS.map((k) => [k, weights[k] ?? 0]),
     );
 
     const t = window.setTimeout(() => {
@@ -222,7 +222,7 @@ function titleCaseFromCamel(key: string) {
 
 function safeNumber(v: string) {
   const n = Number(v);
-  if (!Number.isFinite(n)) return 1;
+  if (!Number.isFinite(n)) return 0;
   const rounded = Math.round(n);
   return clampWeight(rounded);
 }
@@ -331,7 +331,7 @@ export function WeightConfigModal({
               </div>
               <input
                 type="number"
-                min={1}
+                min={0}
                 max={WEIGHT_MAX}
                 step={1}
                 className="w-20 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 text-right font-mono text-sm shadow-[2px_2px_0_oklch(var(--border))] focus:outline-none focus:ring-3 focus:ring-[oklch(var(--primary))]"
@@ -450,16 +450,16 @@ export function WeightConfigModal({
 
 function pWeight(weights: AttributeWeights, key: AttributeKey) {
   const v = weights[key];
-  return typeof v === "number" ? v : 1;
+  return typeof v === "number" ? v : 0;
 }
 
 function clampWeight(value: number) {
-  if (!Number.isFinite(value)) return 1;
-  return Math.min(WEIGHT_MAX, Math.max(1, Math.round(value)));
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(WEIGHT_MAX, Math.max(0, Math.round(value)));
 }
 
 function defaultWeights(): AttributeWeights {
-  return Object.fromEntries(ALL_KEYS.map((k) => [k, 1])) as AttributeWeights;
+  return Object.fromEntries(ALL_KEYS.map((k) => [k, 0])) as AttributeWeights;
 }
 
 function withNormalizedWeights(profile: WeightProfile): WeightProfile {
@@ -468,7 +468,7 @@ function withNormalizedWeights(profile: WeightProfile): WeightProfile {
 
   for (const k of ALL_KEYS) {
     const raw = weights[k];
-    normalized[k] = clampWeight(typeof raw === "number" ? raw : 1);
+    normalized[k] = clampWeight(typeof raw === "number" ? raw : 0);
   }
 
   return { ...profile, weights: normalized };
