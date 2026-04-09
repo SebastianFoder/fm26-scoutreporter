@@ -102,6 +102,9 @@ function shallowRecordEqual(a: Record<string, number>, b: Record<string, number>
 }
 
 function migrateWeightsProfile(raw: unknown): MoneyballWeightsProfile {
+  if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
+    return { ...DEFAULT_WEIGHTS };
+  }
   const base = raw as Partial<MoneyballWeightsProfile> & LegacyWeightsProfile;
   return {
     id: base.id ?? DEFAULT_WEIGHTS.id,
