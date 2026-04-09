@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.2.1...v1.3.0) (2026-04-09)
+
+
+### Features
+
+* **app:** add moneyball and attribute modes ([3f3ab7b](https://github.com/SebastianFoder/fm26-scoutreporter/commit/3f3ab7b963f248eeb1161dc1a3c2ce55f5b4713f))
+
 ## [1.2.1](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.2.0...v1.2.1) (2026-04-05)
 
 
