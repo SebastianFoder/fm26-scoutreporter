@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.3.0...v1.3.1) (2026-04-09)
+
+
+### Bug Fixes
+
+* **moneyball:** handle null stored weights in migrateWeightsProfile ([4686f79](https://github.com/SebastianFoder/fm26-scoutreporter/commit/4686f79813c15b97ae675dacfbe15ac532855dfa))
+
 # [1.3.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.2.1...v1.3.0) (2026-04-09)
 
 
