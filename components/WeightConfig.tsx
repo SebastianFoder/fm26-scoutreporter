@@ -16,7 +16,6 @@ import type {
 } from "@/types/weights";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
-import { useAnalytics } from "./AnalyticsConsent";
 
 const STORAGE_KEY = "weightProfiles";
 
@@ -91,7 +90,6 @@ function useWeightContext(): WeightContextValue {
 }
 
 export function WeightProvider({ children }: { children: React.ReactNode }) {
-  const { capture } = useAnalytics();
   const [state, setState] = useState<StoredConfig>({
     activeId: DEFAULT_PROFILE.id,
     profiles: [withNormalizedWeights(DEFAULT_PROFILE)],
@@ -106,29 +104,6 @@ export function WeightProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     saveToStorage(state);
   }, [state]);
-
-  // Debounced capture of aggregate weight usage (no attribute names/ids)
-  useEffect(() => {
-    const active =
-      state.profiles.find((p) => p.id === state.activeId) ??
-      state.profiles[0] ??
-      withNormalizedWeights(DEFAULT_PROFILE);
-
-    // Capture per-attribute weights for the active profile
-    const weights = withNormalizedWeights(active).weights;
-    const weightsByAttribute = Object.fromEntries(
-      ALL_KEYS.map((k) => [k, weights[k] ?? 0]),
-    );
-
-    const t = window.setTimeout(() => {
-      capture("weights_profile_updated", {
-        profile_id: active.id,
-        weights: weightsByAttribute,
-      });
-    }, 800);
-
-    return () => window.clearTimeout(t);
-  }, [state.activeId, state.profiles, capture]);
 
   return (
     <WeightContext.Provider value={{ state, setState }}>

@@ -7,7 +7,6 @@ import { computeScore } from "@/lib/scoring";
 import { useActiveWeights } from "@/components/WeightConfig";
 import { useHighlightedAttributes } from "@/components/HighlightedAttributesConfig";
 import Link from "next/link";
-import { useAnalytics } from "@/components/AnalyticsConsent";
 import { Button } from "@/components/Button";
 import { getGroupedAttributeValue } from "@/lib/grouped-attribute-value";
 
@@ -32,7 +31,6 @@ export default function CompareClient({
   const [page, setPage] = useState(1);
   const weights = useActiveWeights();
   const highlighted = useHighlightedAttributes();
-  const { capture } = useAnalytics();
 
   const highlightedKeys =
     highlighted.length > 0 ? highlighted : FALLBACK_HIGHLIGHTED_KEYS;
@@ -81,15 +79,6 @@ export default function CompareClient({
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
-
-  useEffect(() => {
-    const count = selectedIds.length;
-    if (count < 2) return;
-    const t = window.setTimeout(() => {
-      capture("compare_selection_changed", { compare_count: count });
-    }, 600);
-    return () => window.clearTimeout(t);
-  }, [selectedIds, capture]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6 text-[oklch(var(--text))]">

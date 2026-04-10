@@ -14,7 +14,6 @@ import { parsePlayersCsv } from "@/lib/parser/csv-parser";
 import { groupPlayerAttributes } from "@/lib/parser/attribute-grouper";
 import type { PlayerAttributes } from "@/types/player-attributes";
 import type { GroupedAttributes } from "@/types/grouped-attributes";
-import { useAnalytics } from "./AnalyticsConsent";
 
 export interface PlayerWithGroups {
   raw: PlayerAttributes;
@@ -66,7 +65,6 @@ export function PlayersDataProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { capture } = useAnalytics();
   const [state, setState] = useState<PlayersDataState>({
     csvText: null,
     players: [],
@@ -114,10 +112,9 @@ export function PlayersDataProvider({
       } catch {
         persisted = false;
       }
-      capture("players_imported", { player_count: players.length });
       return persisted;
     },
-    [capture],
+    [],
   );
 
   const clear = useCallback(() => {

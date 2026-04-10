@@ -12,7 +12,6 @@ import {
 import type { AttributeKey } from "@/types/weights";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
-import { useAnalytics } from "./AnalyticsConsent";
 
 export interface HighlightProfile {
   id: string;
@@ -79,7 +78,6 @@ export function HighlightedAttributesProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { capture } = useAnalytics();
   const [state, setState] = useState<StoredConfig>({
     activeId: DEFAULT_PROFILE.id,
     profiles: [DEFAULT_PROFILE],
@@ -94,22 +92,6 @@ export function HighlightedAttributesProvider({
   useEffect(() => {
     saveToStorage(state);
   }, [state]);
-
-  // Debounced capture of highlight usage (count only)
-  useEffect(() => {
-    const active =
-      state.profiles.find((p) => p.id === state.activeId) ??
-      state.profiles[0] ??
-      DEFAULT_PROFILE;
-
-    const count = active.highlighted?.length ?? 0;
-
-    const t = window.setTimeout(() => {
-      capture("highlight_profile_updated", { highlighted_count: count });
-    }, 800);
-
-    return () => window.clearTimeout(t);
-  }, [state.activeId, state.profiles, capture]);
 
   return (
     <HighlightContext.Provider value={{ state, setState }}>

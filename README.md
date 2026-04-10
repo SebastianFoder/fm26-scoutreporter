@@ -53,24 +53,6 @@ The custom FM view is included at:
 
 Users can download it from the **How to use** page.
 
-## Analytics (PostHog) with opt-in consent
-
-This app supports **PostHog** analytics with a **first-launch opt-in modal**.
-
-- If the user opts out, analytics are disabled for the client and the choice is saved in `localStorage`.
-- The footer includes an “Analytics preferences” link to reopen the consent modal.
-
-### Environment variables
-
-Create `.env.local`:
-
-```bash
-NEXT_PUBLIC_POSTHOG_KEY=phc_...
-NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
-```
-
-If `NEXT_PUBLIC_POSTHOG_KEY` is not set, PostHog will not initialize even if the user opts in.
-
 ## Releases
 
 This project uses [semantic-release](https://github.com/semantic-release/semantic-release) to automate versioning and GitHub Releases. Releases are triggered automatically when commits land on `master`.
@@ -91,5 +73,4 @@ Other prefixes like `chore:`, `docs:`, `ci:` do not trigger a release.
 - React
 - TypeScript
 - Tailwind CSS
-- PostHog (`posthog-js`)
 

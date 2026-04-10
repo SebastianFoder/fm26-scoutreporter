@@ -10,10 +10,6 @@ import Link from "next/link";
 import { WeightProvider } from "@/components/WeightConfig";
 import { PlayersDataProvider } from "@/components/PlayersDataProvider";
 import { HighlightedAttributesProvider } from "@/components/HighlightedAttributesConfig";
-import {
-  AnalyticsConsentProvider,
-  AnalyticsPreferencesLink,
-} from "@/components/AnalyticsConsent";
 import { MoneyballDataProvider } from "@/features/moneyball/MoneyballDataProvider";
 
 const outfit = Outfit({
@@ -76,13 +72,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${outfit.variable} ${spaceMono.variable} antialiased`}>
         <AttributeColorProvider>
-          <AnalyticsConsentProvider>
-            <WeightProvider>
-              <PlayersDataProvider>
-                <MoneyballDataProvider>
-                  <HighlightedAttributesProvider>
-                    <div className="flex min-h-screen flex-col">
-                      <header className="flex items-center justify-end gap-2 border-b-3 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-2">
+          <WeightProvider>
+            <PlayersDataProvider>
+              <MoneyballDataProvider>
+                <HighlightedAttributesProvider>
+                  <div className="flex min-h-screen flex-col">
+                    <header className="flex items-center justify-end gap-2 border-b-3 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-2">
                         <Link
                           href="/"
                           className="rounded-lg border-2 border-transparent px-3 py-1 text-sm font-bold uppercase tracking-wide text-[oklch(var(--text))] hover:border-[oklch(var(--border))] hover:bg-[oklch(var(--background))]"
@@ -113,45 +108,43 @@ export default function RootLayout({
                         >
                           How to use
                         </Link>
-                        <AttributeColorConfig />
-                        <ThemeSwitcher />
-                      </header>
-                      <main className="flex-1">{children}</main>
-                      <footer className="border-t-3 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-4">
-                        <div className="mx-auto flex max-w-6xl flex-col gap-2 text-sm text-[oklch(var(--text))] sm:flex-row sm:items-center sm:justify-between">
-                          <div>
-                            Developed by{" "}
-                            <span className="font-bold">
-                              Sebastian Foder
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <a
-                              href="https://github.com/SebastianFoder"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
-                            >
-                              GitHub
-                            </a>
-                            <a
-                              href="https://x.com/F1ngs"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
-                            >
-                              Twitter
-                            </a>
-                            <AnalyticsPreferencesLink className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]" />
-                          </div>
+                      <AttributeColorConfig />
+                      <ThemeSwitcher />
+                    </header>
+                    <main className="flex-1">{children}</main>
+                    <footer className="border-t-3 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-4 py-4">
+                      <div className="mx-auto flex max-w-6xl flex-col gap-2 text-sm text-[oklch(var(--text))] sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          Developed by{" "}
+                          <span className="font-bold">
+                            Sebastian Foder
+                          </span>
                         </div>
-                      </footer>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <a
+                            href="https://github.com/SebastianFoder"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
+                          >
+                            GitHub
+                          </a>
+                          <a
+                            href="https://x.com/F1ngs"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-bold text-[oklch(var(--primary))] underline decoration-2 underline-offset-2 hover:decoration-[oklch(var(--alt))]"
+                          >
+                            Twitter
+                          </a>
+                        </div>
+                      </div>
+                    </footer>
                   </div>
                 </HighlightedAttributesProvider>
               </MoneyballDataProvider>
-              </PlayersDataProvider>
-            </WeightProvider>
-          </AnalyticsConsentProvider>
+            </PlayersDataProvider>
+          </WeightProvider>
         </AttributeColorProvider>
       </body>
     </html>
