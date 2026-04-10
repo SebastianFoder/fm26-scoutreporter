@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.3.1...v1.4.0) (2026-04-10)
+
+
+### Features
+
+* **app:** add mustermann mode and expand stat import support ([e7713d0](https://github.com/SebastianFoder/fm26-scoutreporter/commit/e7713d05932de2127ba0aaa3e2038f3a360fcb92))
+
 ## [1.3.1](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.3.0...v1.3.1) (2026-04-09)
 
 
