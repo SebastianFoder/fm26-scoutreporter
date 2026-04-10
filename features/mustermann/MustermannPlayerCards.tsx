@@ -392,11 +392,11 @@ export function MustermannPlayerCards() {
 
     return derivedAll.filter((d) => {
       if (positionGroupFilter.length > 0 && !positionGroupFilter.includes(d.positionGroup)) return false;
-      const r = d.scores;
-      if (!inBounds(r.defendCategoryScore, defMin, defMax)) return false;
-      if (!inBounds(r.supportCategoryScore, supMin, supMax)) return false;
-      if (!inBounds(r.createCategoryScore, crMin, crMax)) return false;
-      if (!inBounds(r.scoreCategoryScore, scMin, scMax)) return false;
+      const { categoryPercentiles: pct, scores: r } = d;
+      if (!inBounds(pct.defend, defMin, defMax)) return false;
+      if (!inBounds(pct.support, supMin, supMax)) return false;
+      if (!inBounds(pct.create, crMin, crMax)) return false;
+      if (!inBounds(pct.score, scMin, scMax)) return false;
       if (!inBounds(r.controlScore, csMin, csMax)) return false;
       if (!inBounds(d.excitementFactor, exMin, exMax)) return false;
       if (!inBounds(d.effortScore, efMin, efMax)) return false;
@@ -485,14 +485,33 @@ export function MustermannPlayerCards() {
               })}
             </div>
           </div>
-          <p className="mb-3 text-xs font-black uppercase tracking-wider text-[oklch(var(--text))]/75">Category &amp; control scores — min / max (leave blank for no bound)</p>
+          <p className="mb-3 text-xs font-black uppercase tracking-wider text-[oklch(var(--text))]/75">
+            Category percentiles (0–100, vs same position group) — min / max (leave blank for no bound)
+          </p>
+          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {(
+              [
+                ["Defend percentile", "defendMin", "defendMax"],
+                ["Support percentile", "supportMin", "supportMax"],
+                ["Create percentile", "createMin", "createMax"],
+                ["Score percentile", "scoreMin", "scoreMax"],
+              ] as const
+            ).map(([label, kMin, kMax]) => (
+              <div key={label} className="space-y-1">
+                <div className="text-xs font-black uppercase tracking-wider">{label}</div>
+                <div className="flex gap-2">
+                  <input type="text" inputMode="decimal" placeholder="Min" value={bounds[kMin]} onChange={(e) => setBound(kMin, e.target.value)} className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 font-mono text-xs font-bold shadow-[2px_2px_0_oklch(var(--border))]" />
+                  <input type="text" inputMode="decimal" placeholder="Max" value={bounds[kMax]} onChange={(e) => setBound(kMax, e.target.value)} className="w-full rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--background))] px-2 py-1 font-mono text-xs font-bold shadow-[2px_2px_0_oklch(var(--border))]" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mb-3 text-xs font-black uppercase tracking-wider text-[oklch(var(--text))]/75">
+            Control, excitement &amp; effort — min / max (raw scores; leave blank for no bound)
+          </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {(
               [
-                ["Defend score", "defendMin", "defendMax"],
-                ["Support score", "supportMin", "supportMax"],
-                ["Create score", "createMin", "createMax"],
-                ["Score category", "scoreMin", "scoreMax"],
                 ["Control score", "controlMin", "controlMax"],
                 ["Excitement factor", "excitementMin", "excitementMax"],
                 ["Effort score", "effortMin", "effortMax"],
