@@ -15,7 +15,7 @@ export default function Home() {
           </p>
         </header>
 
-        <section className="grid gap-5 md:grid-cols-2">
+        <section className="grid gap-5 md:grid-cols-3">
           <article className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-6 py-5 shadow-[4px_4px_0_oklch(var(--border))]">
             <h2 className="text-2xl font-black uppercase tracking-tight">
               Attribute Mode
@@ -49,6 +49,23 @@ export default function Home() {
                 className="inline-flex rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--primary))] px-4 py-2 text-sm font-bold text-[oklch(var(--background))] shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
               >
                 Open Moneyball Mode
+              </Link>
+            </div>
+          </article>
+          <article className="rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-6 py-5 shadow-[4px_4px_0_oklch(var(--border))]">
+            <h2 className="text-2xl font-black uppercase tracking-tight">
+              Mustermann Mode
+            </h2>
+            <p className="mt-2 text-sm text-[oklch(var(--text))/0.8]">
+              Work with Mustermann-style exports including Best Pos and Asking
+              Price, then rank players with control and excitement scorecards.
+            </p>
+            <div className="mt-4">
+              <Link
+                href="/mustermann"
+                className="inline-flex rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--primary))] px-4 py-2 text-sm font-bold text-[oklch(var(--background))] shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              >
+                Open Mustermann Mode
               </Link>
             </div>
           </article>

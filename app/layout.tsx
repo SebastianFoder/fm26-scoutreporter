@@ -102,6 +102,12 @@ export default function RootLayout({
                           Moneyball
                         </Link>
                         <Link
+                          href="/mustermann"
+                          className="rounded-lg border-2 border-transparent px-3 py-1 text-sm font-bold uppercase tracking-wide text-[oklch(var(--text))] hover:border-[oklch(var(--border))] hover:bg-[oklch(var(--background))]"
+                        >
+                          Mustermann
+                        </Link>
+                        <Link
                           href="/how-to-use"
                           className="rounded-lg border-2 border-transparent px-3 py-1 text-sm font-bold uppercase tracking-wide text-[oklch(var(--text))] hover:border-[oklch(var(--border))] hover:bg-[oklch(var(--background))]"
                         >

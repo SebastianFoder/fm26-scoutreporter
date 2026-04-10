@@ -16,6 +16,13 @@ export const MONEYBALL_REQUIRED_HEADERS = [
   "Age",
   "Potential",
   "Wage",
+  "Best Pos",
+  "Asking Price",
+  "Shot/90",
+  "KP/90",
+  "Tck A",
+  "Hdrs A",
+  "Off",
 ] as const;
 
 export const LOWER_IS_BETTER = new Set<MoneyballStat>([
@@ -41,6 +48,9 @@ export const NON_STAT_HEADERS = new Set<string>([
   "Age",
   "Potential",
   "Wage",
+  "Best Pos",
+  "Asking Price",
+  "Off",
 ]);
 
 export const DIRECTION_MAP: DirectionMap = {

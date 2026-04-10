@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -14,9 +15,17 @@ import {
 } from "./compute";
 import { moneyballDb } from "./db";
 import { buildDefaultRoleGroups } from "./group-presets";
-import { allDivisionKeysFromRows } from "./division-key";
+import { buildMustermannRoleGroups } from "@/features/mustermann/group-presets";
+import { allDivisionKeysFromRows, decodeDivisionKey } from "./division-key";
+import { lookupPowerRating } from "@/features/mustermann/opta-league-power-ratings";
+import {
+  MUSTERMANN_MODE_CONFIG_ID,
+  MUSTERMANN_OPTA_RANKINGS_CONFIG_ID,
+} from "@/features/mustermann/mustermann-schema";
 import { parseMoneyballCsv } from "./parser";
+import { parseMustermannMoneyballCsv } from "@/features/mustermann/parser";
 import { DEFAULT_GK_GROUP_WEIGHTS, DEFAULT_GK_STAT_WEIGHTS } from "./default-weights";
+import { DEFAULT_OPTA_RANK } from "@/features/mustermann/control-score";
 import {
   normalizeStatWeights,
   resolveStatKeysFromStored,
@@ -83,6 +92,12 @@ type MoneyballContextValue = {
   clearSelection: () => void;
   setUiRole: React.Dispatch<React.SetStateAction<PlayerRole>>;
   setWeightsProfile: React.Dispatch<React.SetStateAction<MoneyballWeightsProfile>>;
+  mustermannMode: boolean;
+  setMustermannMode: (next: boolean) => void;
+  optaRankings: Record<string, number>;
+  setOptaRankForDivision: (divisionKey: string, rank: number | null) => void;
+  applyOptaPowerRatingDefaults: (mode: "gaps-only" | "overwrite-matched") => void;
+  discoveredDivisionKeys: string[];
 };
 
 const MoneyballContext = createContext<MoneyballContextValue | null>(null);
@@ -158,8 +173,21 @@ export function MoneyballDataProvider({
   const [uiRole, setUiRole] = useState<PlayerRole>("outfield");
   const [weightsProfile, setWeightsProfile] =
     useState<MoneyballWeightsProfile>(DEFAULT_WEIGHTS);
+  const [mustermannMode, setMustermannModeState] = useState(false);
+  const [optaRankings, setOptaRankingsState] = useState<Record<string, number>>({});
 
-  const roleGroups = useMemo(() => buildDefaultRoleGroups(statKeys), [statKeys]);
+  const roleGroups = useMemo(
+    () =>
+      mustermannMode
+        ? buildMustermannRoleGroups(statKeys)
+        : buildDefaultRoleGroups(statKeys),
+    [mustermannMode, statKeys],
+  );
+
+  const discoveredDivisionKeys = useMemo(
+    () => allDivisionKeysFromRows([...baselineRows, ...playerRows]),
+    [baselineRows, playerRows],
+  );
 
   useEffect(() => {
     (async () => {
@@ -168,6 +196,12 @@ export function MoneyballDataProvider({
       const loadedBaseline = (await moneyballDb.getBaseline()) ?? DEFAULT_BASELINE;
       const loadedComputed = await moneyballDb.getLatestComputed();
       const loadedWeightsRaw = await moneyballDb.loadConfig<unknown>("weights");
+      const loadedMustermannMode =
+        (await moneyballDb.loadConfig<boolean>(MUSTERMANN_MODE_CONFIG_ID)) ?? false;
+      const loadedOpta =
+        (await moneyballDb.loadConfig<Record<string, number>>(
+          MUSTERMANN_OPTA_RANKINGS_CONFIG_ID,
+        )) ?? {};
 
       const loadedBaselineRows = dbBaselineImports.flatMap((x) => x.rows);
       const loadedPlayerRows = dbPlayerViewImport?.rows ?? [];
@@ -209,6 +243,8 @@ export function MoneyballDataProvider({
       setBaselineState(loadedBaseline);
       setLatestComputed(loadedComputed);
       setWeightsProfile(resolvedWeights);
+      setMustermannModeState(loadedMustermannMode);
+      setOptaRankingsState(loadedOpta);
       setUiRole(loadedPlayerRows.some((r) => r.role === "outfield") ? "outfield" : "gk");
       setLoading(false);
     })();
@@ -223,6 +259,62 @@ export function MoneyballDataProvider({
     if (loading) return;
     void moneyballDb.saveConfig("weights", weightsProfile);
   }, [weightsProfile, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    void moneyballDb.saveConfig(MUSTERMANN_MODE_CONFIG_ID, mustermannMode);
+  }, [mustermannMode, loading]);
+
+  useEffect(() => {
+    if (loading) return;
+    void moneyballDb.saveConfig(MUSTERMANN_OPTA_RANKINGS_CONFIG_ID, optaRankings);
+  }, [optaRankings, loading]);
+
+  const setMustermannMode = (next: boolean) => {
+    setMustermannModeState(next);
+  };
+
+  const setOptaRankForDivision = (divisionKey: string, rank: number | null) => {
+    setOptaRankingsState((prev) => {
+      const out = { ...prev };
+      if (rank === null || !Number.isFinite(rank) || rank <= 0) {
+        delete out[divisionKey];
+      } else {
+        out[divisionKey] = rank;
+      }
+      return out;
+    });
+  };
+
+  const applyOptaPowerRatingDefaults = useCallback(
+    (mode: "gaps-only" | "overwrite-matched") => {
+      setOptaRankingsState((prev) => {
+        const next = { ...prev };
+        let changed = false;
+        for (const key of discoveredDivisionKeys) {
+          const { basedIn, division } = decodeDivisionKey(key);
+          const pr = lookupPowerRating(basedIn, division) ?? DEFAULT_OPTA_RANK;
+          if (mode === "gaps-only" && next[key] !== undefined) continue;
+          if (next[key] === pr) continue;
+          next[key] = pr;
+          changed = true;
+        }
+        return changed ? next : prev;
+      });
+    },
+    [discoveredDivisionKeys],
+  );
+
+  useEffect(() => {
+    if (loading || !mustermannMode || discoveredDivisionKeys.length === 0) return;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) applyOptaPowerRatingDefaults("gaps-only");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, mustermannMode, discoveredDivisionKeys, applyOptaPowerRatingDefaults]);
 
   useEffect(() => {
     if (loading) return;
@@ -347,7 +439,9 @@ export function MoneyballDataProvider({
 
     for (const file of Array.from(files)) {
       const text = await file.text();
-      const parsed = parseMoneyballCsv(text);
+      const parsed = mustermannMode
+        ? parseMustermannMoneyballCsv(text)
+        : parseMoneyballCsv(text);
       if (parsed.errors.length > 0) {
         nextErrors.push(
           ...parsed.errors.map((e) => ({
@@ -396,7 +490,9 @@ export function MoneyballDataProvider({
   const importPlayerViewCsvFile = async (file: File | null) => {
     if (!file) return;
     const text = await file.text();
-    const parsed = parseMoneyballCsv(text);
+    const parsed = mustermannMode
+      ? parseMustermannMoneyballCsv(text)
+      : parseMoneyballCsv(text);
     if (parsed.errors.length > 0) {
       setParseErrors(
         parsed.errors.map((e) => ({
@@ -488,6 +584,12 @@ export function MoneyballDataProvider({
     clearSelection: () => setSelectedIds([]),
     setUiRole,
     setWeightsProfile,
+    mustermannMode,
+    setMustermannMode,
+    optaRankings,
+    setOptaRankForDivision,
+    applyOptaPowerRatingDefaults,
+    discoveredDivisionKeys,
   };
 
   return (

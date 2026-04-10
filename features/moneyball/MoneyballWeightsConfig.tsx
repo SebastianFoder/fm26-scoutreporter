@@ -7,6 +7,7 @@ import { defaultGroupWeightsForRole } from "./default-weights";
 import { useMoneyball } from "./MoneyballDataProvider";
 import { getStatLabel } from "./stat-labels";
 import { groupStatKeysForRoleDisplay } from "./ui-stat-grouping";
+import { groupMustermannStatKeysForRoleDisplay } from "@/features/mustermann/ui-stat-grouping";
 
 type StatFilterMode = "all" | "selected" | "unselected";
 type SortMode = "az" | "selected-first";
@@ -18,8 +19,15 @@ export function MoneyballWeightsConfig({
   open: boolean;
   onClose: () => void;
 }) {
-  const { statKeys, uiRole, setUiRole, roleGroups, weightsProfile, setWeightsProfile } =
-    useMoneyball();
+  const {
+    statKeys,
+    uiRole,
+    setUiRole,
+    roleGroups,
+    weightsProfile,
+    setWeightsProfile,
+    mustermannMode,
+  } = useMoneyball();
   const groups = roleGroups[uiRole];
   const activeIds = new Set(weightsProfile.activeGroupIdsByRole[uiRole] ?? []);
   const [query, setQuery] = useState("");
@@ -62,8 +70,11 @@ export function MoneyballWeightsConfig({
   const nonDefaultStatWeightCount = statKeys.filter((k) => (weightsProfile.statWeights[k] ?? 0) !== 0).length;
   const activeGroupCount = groups.filter((g) => activeIds.has(g.id)).length;
   const groupedVisibleStatKeys = useMemo(
-    () => groupStatKeysForRoleDisplay(uiRole, visibleStatKeys),
-    [uiRole, visibleStatKeys],
+    () =>
+      mustermannMode
+        ? groupMustermannStatKeysForRoleDisplay(uiRole, visibleStatKeys)
+        : groupStatKeysForRoleDisplay(uiRole, visibleStatKeys),
+    [uiRole, visibleStatKeys, mustermannMode],
   );
 
   return (

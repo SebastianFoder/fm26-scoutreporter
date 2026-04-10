@@ -15,7 +15,28 @@ export default function AttributeModeHome() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [weightsOpen, setWeightsOpen] = useState(false);
   const [highlightsOpen, setHighlightsOpen] = useState(false);
+  const [testDataLoading, setTestDataLoading] = useState(false);
   const router = useRouter();
+
+  const loadTestData = async () => {
+    setTestDataLoading(true);
+    try {
+      const res = await fetch("/api/fixtures/attribute");
+      if (!res.ok) throw new Error("Failed to fetch fixture");
+      const text = await res.text();
+      const persisted = setCsvText(text);
+      setSelectedIds([]);
+      setError(
+        persisted
+          ? null
+          : "Import loaded in this tab only: browser storage is full or blocked.",
+      );
+    } catch {
+      setError("Could not load test data.");
+    } finally {
+      setTestDataLoading(false);
+    }
+  };
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -60,7 +81,7 @@ export default function AttributeModeHome() {
               export.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               color="alt"
               variant="outline"
@@ -73,6 +94,15 @@ export default function AttributeModeHome() {
             >
               Clear import
             </Button>
+            <Button
+              color="alt"
+              variant="outline"
+              size="md"
+              onClick={() => void loadTestData()}
+              disabled={testDataLoading}
+            >
+              {testDataLoading ? "Loading…" : "Load test data"}
+            </Button>
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--primary))] px-5 py-2.5 text-sm font-bold text-[oklch(var(--background))] shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
               <input
                 type="file"
@@ -83,6 +113,20 @@ export default function AttributeModeHome() {
               <span>Choose CSV file</span>
             </label>
           </div>
+        </section>
+        <section className="flex flex-col items-start gap-3 rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--surface))] px-6 py-5 shadow-[4px_4px_0_oklch(var(--border))] sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide">Attribute view (.fmf)</p>
+            <p className="text-xs text-[oklch(var(--text))/0.65]">
+              Import this view in FM26 before exporting CSV for Attribute mode.
+            </p>
+          </div>
+          <a
+            href="/SCOUT%20REPORTER%20Attributes%20v1.fmf"
+            className="inline-flex items-center rounded-lg border-2 border-[oklch(var(--border))] bg-[oklch(var(--primary))] px-4 py-2 text-sm font-bold text-[oklch(var(--background))] shadow-[2px_2px_0_oklch(var(--border))] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_oklch(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          >
+            Download Attribute View
+          </a>
         </section>
 
         {error && (

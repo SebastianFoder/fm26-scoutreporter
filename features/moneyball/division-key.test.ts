@@ -3,10 +3,19 @@ import assert from "node:assert/strict";
 import {
   DIVISION_KEY_SEP,
   allDivisionKeysFromRows,
+  decodeDivisionKey,
   encodeDivisionKey,
   rowMatchesDivisionKey,
 } from "./division-key";
 import type { MoneyballRow } from "./types";
+
+test("decodeDivisionKey inverts encodeDivisionKey", () => {
+  const key = encodeDivisionKey("Spain", "First Division");
+  assert.deepEqual(decodeDivisionKey(key), {
+    basedIn: "Spain",
+    division: "First Division",
+  });
+});
 
 test("encodeDivisionKey uses delimiter so same division name differs by country", () => {
   const a = encodeDivisionKey("England", "Premier Division");

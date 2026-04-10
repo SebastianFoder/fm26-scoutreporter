@@ -23,3 +23,4 @@ test("buildDefaultRoleGroups creates outfield and gk presets from available keys
   assert.ok(groups.gk.some((g) => g.name === "Shot Stopping"));
   assert.equal(groups.gk.some((g) => g.name === "Distribution"), true);
 });
+

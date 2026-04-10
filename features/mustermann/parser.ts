@@ -1,12 +1,12 @@
+import { isGoalkeeper } from "@/features/moneyball/schema";
+import { isMoneyballStat, MoneyballStat } from "@/features/moneyball/moneyball-stat";
+import type { MoneyballImportResult, MoneyballRow } from "@/features/moneyball/types";
 import {
-  MONEYBALL_REQUIRED_HEADERS,
-  NON_STAT_HEADERS,
-  isGoalkeeper,
-} from "./schema";
-import { isMoneyballStat, MoneyballStat } from "./moneyball-stat";
-import type { MoneyballImportResult, MoneyballRow } from "./types";
-
-const OFF_HEADER = "Off";
+  MUSTERMANN_HDRS_A_HEADER,
+  MUSTERMANN_NON_STAT_HEADERS,
+  MUSTERMANN_OFF_HEADER,
+  MUSTERMANN_REQUIRED_HEADERS,
+} from "./mustermann-schema";
 
 function toNumber(value: string): number {
   const normalized = value.replace(/[,%€\s]/g, "");
@@ -15,11 +15,10 @@ function toNumber(value: string): number {
 }
 
 function splitCsvLine(line: string): string[] {
-  // Export format is strict and does not include quoted semicolons.
   return line.split(";").map((x) => x.trim());
 }
 
-export function parseMoneyballCsv(csv: string): MoneyballImportResult {
+export function parseMustermannMoneyballCsv(csv: string): MoneyballImportResult {
   const lines = csv
     .split(/\r?\n/)
     .map((l) => l.trim())
@@ -37,42 +36,32 @@ export function parseMoneyballCsv(csv: string): MoneyballImportResult {
   const headerSet = new Set(headers);
   const errors: MoneyballImportResult["errors"] = [];
 
-  for (const h of MONEYBALL_REQUIRED_HEADERS) {
-    if (!headerSet.has(h)) {
-      errors.push({ line: 1, message: `Missing required column: ${h}` });
-    }
+  for (const h of MUSTERMANN_REQUIRED_HEADERS) {
+    if (!headerSet.has(h)) errors.push({ line: 1, message: `Missing required column: ${h}` });
   }
-
-  if (errors.length > 0) {
-    return { rows: [], errors, statKeys: [] };
+  if (!headerSet.has(MUSTERMANN_HDRS_A_HEADER)) {
+    errors.push({ line: 1, message: `Missing required column: ${MUSTERMANN_HDRS_A_HEADER}` });
   }
+  if (!headerSet.has(MUSTERMANN_OFF_HEADER)) {
+    errors.push({ line: 1, message: `Missing required column: ${MUSTERMANN_OFF_HEADER}` });
+  }
+  if (errors.length > 0) return { rows: [], errors, statKeys: [] };
 
   const col = (name: string) => headers.indexOf(name);
-  const statKeyCandidates = headers.filter((h) => !NON_STAT_HEADERS.has(h));
-  const unknown = statKeyCandidates.filter((h) => !isMoneyballStat(h));
-  if (unknown.length > 0) {
-    return {
-      rows: [],
-      errors: [
-        {
-          line: 1,
-          message: `Unknown stat column(s): ${unknown.join(", ")}`,
-        },
-      ],
-      statKeys: [],
-    };
+  const statKeysOrdered: MoneyballStat[] = [];
+  for (const h of headers) {
+    if (MUSTERMANN_NON_STAT_HEADERS.has(h)) continue;
+    if (h === MUSTERMANN_OFF_HEADER) continue;
+    if (!isMoneyballStat(h)) {
+      errors.push({ line: 1, message: `Unknown stat column: ${h}` });
+      break;
+    }
+    statKeysOrdered.push(h);
   }
+  if (errors.length > 0) return { rows: [], errors, statKeys: [] };
 
-  const statKeys = statKeyCandidates as MoneyballStat[];
-  const statKeysWithDerived = [...statKeys];
-  if (!statKeysWithDerived.includes(MoneyballStat.HeadersAttemptedPer90)) {
-    statKeysWithDerived.push(MoneyballStat.HeadersAttemptedPer90);
-  }
-  if (!statKeysWithDerived.includes(MoneyballStat.OffsidesPer90)) {
-    statKeysWithDerived.push(MoneyballStat.OffsidesPer90);
-  }
+  const statKeys = [...statKeysOrdered, MoneyballStat.HeadersAttemptedPer90, MoneyballStat.OffsidesPer90];
   const rows: MoneyballRow[] = [];
-
   for (let i = 1; i < lines.length; i += 1) {
     const cols = splitCsvLine(lines[i]);
     if (cols.length !== headers.length) {
@@ -84,15 +73,14 @@ export function parseMoneyballCsv(csv: string): MoneyballImportResult {
     }
 
     const stats: Partial<Record<MoneyballStat, number>> = {};
-    for (const key of statKeys) {
-      stats[key] = toNumber(cols[col(key)] ?? "0");
-    }
+    for (const key of statKeysOrdered) stats[key] = toNumber(cols[col(key)] ?? "0");
 
     const minutes = toNumber(cols[col("Minutes")] ?? "0");
-    const headersAttempted = toNumber(cols[col(MoneyballStat.HeadersAttempted)] ?? "0");
-    const offsidesTotal = toNumber(cols[col(OFF_HEADER)] ?? "0");
-    stats[MoneyballStat.HeadersAttemptedPer90] = minutes > 0 ? (headersAttempted / minutes) * 90 : 0;
-    stats[MoneyballStat.OffsidesPer90] = minutes > 0 ? (offsidesTotal / minutes) * 90 : 0;
+    const hdrsA = toNumber(cols[col(MUSTERMANN_HDRS_A_HEADER)] ?? "0");
+    const off = toNumber(cols[col(MUSTERMANN_OFF_HEADER)] ?? "0");
+    stats[MoneyballStat.HeadersAttempted] = hdrsA;
+    stats[MoneyballStat.HeadersAttemptedPer90] = minutes > 0 ? (hdrsA / minutes) * 90 : 0;
+    stats[MoneyballStat.OffsidesPer90] = minutes > 0 ? (off / minutes) * 90 : 0;
 
     const position = cols[col("Position")] ?? "";
     rows.push({
@@ -117,5 +105,5 @@ export function parseMoneyballCsv(csv: string): MoneyballImportResult {
     });
   }
 
-  return { rows, errors, statKeys: statKeysWithDerived };
+  return { rows, errors, statKeys };
 }

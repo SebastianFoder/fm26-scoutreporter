@@ -19,6 +19,10 @@ export interface MoneyballRow {
   minsPerGame: number;
   appearancesRaw: string;
   stats: Partial<Record<MoneyballStat, number>>;
+  /** Set when imported via Mustermann Mode (`Best Pos` column). */
+  bestPos?: string;
+  /** Set when imported via Mustermann Mode (`Asking Price` column). */
+  askingPrice?: string;
 }
 
 export interface MoneyballParseError {

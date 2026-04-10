@@ -137,6 +137,7 @@ const PRESET_DEFINITIONS: PresetDefinition = {
   ],
 };
 
+
 export const ROLE_CATEGORY_DEFINITIONS: Record<PlayerRole, Array<{ id: string; title: string }>> = {
   outfield: PRESET_DEFINITIONS.outfield.map((category) => ({
     id: category.id,
@@ -160,6 +161,7 @@ export const ROLE_STAT_CATEGORY_LOOKUP: RoleScoped<Partial<Record<MoneyballStat,
     ),
   ) as Partial<Record<MoneyballStat, string>>,
 };
+
 
 function buildRoleGroups(role: PlayerRole, statKeys: MoneyballStat[]): StatGroup[] {
   const available = new Set(statKeys);
