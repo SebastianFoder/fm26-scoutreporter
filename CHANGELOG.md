@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.4.0...v1.4.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* **mustermann:** filter defend/support/create/score by card percentiles ([c614baf](https://github.com/SebastianFoder/fm26-scoutreporter/commit/c614baffe0506694cd17d0e4e0a6b782ef7feb0f))
+
 # [1.4.0](https://github.com/SebastianFoder/fm26-scoutreporter/compare/v1.3.1...v1.4.0) (2026-04-10)
 
 
